@@ -10,21 +10,6 @@ body.font-persian {
   font-family: 'Vazirmatn', sans-serif;
 }
 
-/* Fix for contentEditable text direction issue */
-.post-editor [contenteditable] {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-  text-align: start; /* only affects alignment, not direction */
-}
-.post-editor [contenteditable] p,
-.post-editor [contenteditable] h1,
-.post-editor [contenteditable] h2,
-.post-editor [contenteditable] li,
-.post-editor [contenteditable] blockquote {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-}
-
 @layer base {
   :root {
     --background: 140 60% 97%;

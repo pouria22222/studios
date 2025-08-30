@@ -110,14 +110,16 @@ export function PostEditor() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             dir="auto"
+            style={{ unicodeBidi: 'plaintext' }}
           />
         <div className="post-editor relative group">
            <div
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px]"
+            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
             dir="auto"
+            style={{ unicodeBidi: 'plaintext', textAlign: 'start' }}
             />
           <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
             <PopoverTrigger asChild>
