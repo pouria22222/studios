@@ -70,11 +70,13 @@ export function PostEditor() {
     <div className="flex flex-col md:flex-row gap-8">
       <div className="flex-grow post-editor">
         <Input
-          dir="auto"
+          id="title"
           placeholder={t.titlePlaceholder}
           className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto mb-4 placeholder:text-muted-foreground/50"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          dir="auto"
+          style={{ unicodeBidi: 'plaintext', direction: 'unset', textAlign: 'start' }}
         />
 
         <div className="relative group">
@@ -82,7 +84,7 @@ export function PostEditor() {
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
+            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4 [direction:unset] [unicode-bidi:plaintext]"
             dir="auto"
             suppressContentEditableWarning
           />

@@ -83,8 +83,19 @@ body {
 /* =========================================================
    رفع قطعی وارونگی متن در ادیتورهای contentEditable
    ========================================================= */
-.post-editor [contenteditable],
+.post-editor [contenteditable] {
+  direction: auto !important;
+  unicode-bidi: plaintext !important;
+  text-align: start !important;
+}
+
 .post-editor [contenteditable] * {
   direction: auto !important;
   unicode-bidi: plaintext !important;
+}
+
+#title {
+  direction: auto !important;
+  unicode-bidi: plaintext !important;
+  text-align: start;
 }
