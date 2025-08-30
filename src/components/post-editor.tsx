@@ -5,33 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { translations } from '@/lib/translations';
 import { useToast } from '@/hooks/use-toast';
-import { useTheme } from '@/components/theme-provider';
+import { Textarea } from '@/components/ui/textarea';
 
 export function PostEditor() {
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('<p><br></p>');
+  const [content, setContent] = useState('');
   const { toast } = useToast();
   const t = translations.postEditor;
-  const { theme } = useTheme();
-
-  const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-    setContent(e.currentTarget.innerHTML);
-  };
 
   const handleSave = () => {
     // In a real app, this would save the post to a database.
-    console.log('Saving post:', { title, content });
+    // For this demo, we'll convert newlines to <p> tags for display.
+    const htmlContent = content.split('\n').map(p => `<p>${p}</p>`).join('');
+    console.log('Saving post:', { title, content: htmlContent });
     toast({
       title: "پست ذخیره شد (شبیه‌سازی)",
       description: "در یک برنامه واقعی، این پست به پایگاه داده ارسال می‌شد.",
     });
   };
-
-  const editorStyle: React.CSSProperties = {
-    color: theme === 'dark' ? 'hsl(var(--foreground))' : 'hsl(var(--foreground))',
-    backgroundColor: theme === 'dark' ? 'hsl(var(--card))' : 'hsl(var(--card))',
-  };
-
 
   return (
     <div className="space-y-6">
@@ -43,14 +34,12 @@ export function PostEditor() {
         dir="auto"
       />
 
-      <div
-        contentEditable
-        onInput={handleContentChange}
-        dangerouslySetInnerHTML={{ __html: content }}
-        className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
-        style={editorStyle}
+      <Textarea
+        placeholder="داستان خود را اینجا بنویسید..."
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4 focus-visible:ring-1"
         dir="auto"
-        suppressContentEditableWarning
       />
 
       <div className="flex justify-end">
