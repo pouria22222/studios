@@ -72,6 +72,13 @@ export const translations = {
         permissionNeeded: 'Permission needed',
         tapToStart: 'Tap to start',
     },
+    admin: {
+      title: 'Admin Panel',
+      dashboard: 'Dashboard',
+      newPost: 'New Post',
+      manageGallery: 'Manage Gallery',
+      settings: 'Settings',
+    }
   },
   fa: {
     header: {
@@ -146,5 +153,12 @@ export const translations = {
         permissionNeeded: 'مجوز لازم است',
         tapToStart: 'برای شروع ضربه بزنید',
     },
+    admin: {
+      title: 'پنل مدیریت',
+      dashboard: 'داشبورد',
+      newPost: 'پست جدید',
+      manageGallery: 'مدیریت گالری',
+      settings: 'تنظیمات',
+    }
   },
 };

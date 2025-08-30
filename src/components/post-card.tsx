@@ -1,16 +1,21 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { CalendarDays } from 'lucide-react';
+import { useLanguage } from '@/context/language-provider';
 
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const snippet = post.content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...';
+  const { language } = useLanguage();
+  const title = post.title[language];
+  const content = post.content[language];
+  const snippet = content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...';
 
   return (
     <Link href={`/posts/${post.id}`} className="group block">
@@ -19,7 +24,7 @@ export function PostCard({ post }: PostCardProps) {
           <div className="aspect-[16/9] relative overflow-hidden rounded-t-lg">
             <Image
               src={post.image}
-              alt={post.title}
+              alt={title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               data-ai-hint={post.imageHint}
@@ -29,14 +34,14 @@ export function PostCard({ post }: PostCardProps) {
         </CardHeader>
         <CardContent className="flex-grow">
           <CardTitle className="font-headline text-2xl leading-tight mb-2 group-hover:text-primary transition-colors">
-            {post.title}
+            {title}
           </CardTitle>
           <p className="text-muted-foreground">{snippet}</p>
         </CardContent>
         <CardFooter className="flex justify-between items-center text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4" />
-            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
           </div>
           <div className="flex gap-2">
             {post.tags.slice(0, 2).map(tag => (

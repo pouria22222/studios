@@ -1,11 +1,17 @@
+export type Language = 'en' | 'fa';
+
+export type LocalizedString = {
+  [key in Language]: string;
+};
+
 export interface Post {
   id: string;
-  title: string;
+  title: LocalizedString;
   author: string;
   date: string;
   image: string;
   imageHint: string;
-  content: string;
+  content: LocalizedString;
   tags: string[];
 }
 
