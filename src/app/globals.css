@@ -99,8 +99,3 @@ body.font-persian {
   direction: auto !important;
   unicode-bidi: plaintext !important;
 }
-
-#title {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-}

@@ -72,7 +72,6 @@ export function PostEditor() {
     <div className="flex flex-col md:flex-row gap-8">
       <div className="flex-grow">
         <Input
-          id="title"
           placeholder={t.titlePlaceholder}
           className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto mb-4 placeholder:text-muted-foreground/50"
           value={title}
