@@ -119,7 +119,6 @@ export function PostEditor() {
             dangerouslySetInnerHTML={{ __html: content }}
             className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
             dir="auto"
-            style={{ unicodeBidi: 'plaintext', textAlign: 'start' }}
             />
           <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
             <PopoverTrigger asChild>
