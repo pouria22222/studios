@@ -116,7 +116,7 @@ export function PostEditor() {
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px]"
+            className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px] [unicode-bidi:plaintext]"
             dir="auto"
             />
           <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
