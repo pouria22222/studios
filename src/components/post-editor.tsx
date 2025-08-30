@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/lib/translations';
 import { refineBlogPostWithAI } from '@/ai/flows/refine-blog-post-with-ai';
 import { voiceToTextArticleCreation } from '@/ai/flows/voice-to-text-article-creation';
-import { Loader2, Wand2, Image as ImageIcon, UploadCloud, Bold, Italic, Link as LinkIcon } from 'lucide-react';
+import { Loader2, Wand2, Image as ImageIcon, UploadCloud, Bold, Italic, Link as LinkIcon, Heading2, Heading3 } from 'lucide-react';
 import { VoiceRecorder } from './voice-recorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import Image from 'next/image';
@@ -229,6 +229,13 @@ export function PostEditor() {
                   </Button>
                   <Button variant="ghost" size="icon" onClick={handleLink}>
                     <LinkIcon className="w-4 h-4" />
+                  </Button>
+                   <div className="border-l mx-1"></div>
+                  <Button variant="ghost" size="icon" onClick={() => handleFormat('formatBlock', '<h2>')}>
+                    <Heading2 className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleFormat('formatBlock', '<h3>')}>
+                    <Heading3 className="w-4 h-4" />
                   </Button>
                 </div>
               )}
