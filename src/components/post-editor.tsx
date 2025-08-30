@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/lib/translations';
 import { refineBlogPostWithAI } from '@/ai/flows/refine-blog-post-with-ai';
@@ -12,7 +11,6 @@ import { Loader2, Wand2, Image as ImageIcon, UploadCloud } from 'lucide-react';
 import { VoiceRecorder } from './voice-recorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import Image from 'next/image';
-import { marked } from 'marked';
 
 export function PostEditor() {
   const [title, setTitle] = useState('');
@@ -23,7 +21,15 @@ export function PostEditor() {
   const t = translations.postEditor;
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const contentImageInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  // Sync state with editor only when necessary
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== content) {
+      editorRef.current.innerHTML = content;
+    }
+  }, [content]);
+
 
   const handleSave = () => {
     console.log('Saving post:', { title, mainImage, content });
@@ -34,7 +40,8 @@ export function PostEditor() {
   };
 
   const handleRefineWithAI = async () => {
-    if (!content) {
+    const currentContent = editorRef.current?.innerHTML || '';
+    if (!currentContent) {
       toast({
         title: t.contentEmpty,
         description: t.contentEmptyDesc,
@@ -44,12 +51,12 @@ export function PostEditor() {
     }
     setIsLoading(true);
     try {
-      const result = await refineBlogPostWithAI({ blogPostContent: content });
-      setContent(result.refinedBlogPostContent);
-      toast({
-        title: t.contentRefined,
-        description: t.contentRefinedDesc,
-      });
+      // We need to handle simple text extraction for the AI
+      const textContent = editorRef.current?.innerText || '';
+      const result = await refineBlogPostWithAI({ blogPostContent: textContent });
+      // The AI returns plain text, so we wrap it in paragraphs
+      const refinedHtml = result.refinedBlogPostContent.split('\n').map(p => `<p>${p}</p>`).join('');
+      setContent(refinedHtml);
     } catch (error) {
       console.error('Error refining content:', error);
       toast({
@@ -65,11 +72,8 @@ export function PostEditor() {
     setIsLoading(true);
     try {
       const result = await voiceToTextArticleCreation({ audioDataUri });
-      setContent((prevContent) => prevContent ? `${prevContent}\n${result.articleDraft}` : result.articleDraft);
-      toast({
-        title: t.voiceTranscribed,
-        description: t.voiceTranscribedDesc,
-      });
+      const newParagraph = `<p>${result.articleDraft}</p>`;
+      setContent((prevContent) => prevContent ? `${prevContent}${newParagraph}` : newParagraph);
     } catch (error) {
       console.error('Error transcribing audio:', error);
       toast({
@@ -81,16 +85,14 @@ export function PostEditor() {
     setIsLoading(false);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImage: (url: string) => void) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result;
         if (typeof result === 'string') {
-          // In a real app, you'd upload this to a server and get a URL.
-          // For now, we'll use the data URI as a placeholder.
-          setImage(result);
+          callback(result);
         }
       };
       reader.readAsDataURL(file);
@@ -98,25 +100,14 @@ export function PostEditor() {
   };
   
   const insertImageInContent = (url: string) => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const markdownImage = `\n![توضیحات تصویر](${url})\n`;
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const newContent = content.substring(0, start) + markdownImage + content.substring(end);
-    
-    setContent(newContent);
-    
-    // Move cursor after the inserted markdown
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + markdownImage.length, start + markdownImage.length);
-    }, 0);
+    if (editorRef.current) {
+      const imgHtml = `<img src="${url}" alt="تصویر درج شده" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />`;
+      // Restore focus and insert image at cursor position
+      editorRef.current.focus();
+      document.execCommand('insertHTML', false, imgHtml);
+      setContent(editorRef.current.innerHTML);
+    }
   };
-  
-  const livePreviewHtml = { __html: marked.parse(content, { gfm: true, breaks: true }) };
-
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -157,7 +148,7 @@ export function PostEditor() {
                 )}
               </CardContent>
             </Card>
-
+            
             <Input
               placeholder={t.titlePlaceholder}
               className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto placeholder:text-muted-foreground/50 bg-transparent"
@@ -165,28 +156,15 @@ export function PostEditor() {
               onChange={(e) => setTitle(e.target.value)}
               dir="auto"
             />
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                 <h3 className="font-semibold">ویرایشگر (Markdown)</h3>
-                 <Textarea
-                    ref={textareaRef}
-                    placeholder="داستان خود را اینجا بنویسید..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="max-w-none text-lg min-h-[500px] border rounded-md p-4 focus-visible:ring-1 bg-transparent font-mono"
-                    dir="auto"
-                  />
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">پیش‌نمایش زنده</h3>
-                <div 
-                  className="prose dark:prose-invert prose-lg max-w-none min-h-[500px] border rounded-md p-4 bg-muted/20" 
-                  dangerouslySetInnerHTML={livePreviewHtml}
-                />
-              </div>
-            </div>
 
+            <div
+              ref={editorRef}
+              contentEditable
+              onBlur={(e) => setContent(e.currentTarget.innerHTML)}
+              className="max-w-none text-lg min-h-[500px] border rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent"
+              dir="auto"
+              suppressContentEditableWarning
+            />
           </div>
           <div className="lg:col-span-1 space-y-6 sticky top-20">
             <Card>

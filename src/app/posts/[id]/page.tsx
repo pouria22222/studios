@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, UserCircle } from 'lucide-react';
-import { marked } from 'marked';
 
 type PostPageProps = {
   params: {
@@ -19,10 +18,6 @@ export default function PostPage({ params }: PostPageProps) {
   }
 
   const { title, content } = post;
-  
-  // Sanitize and parse the Markdown content
-  const parsedContent = marked.parse(content, { gfm: true, breaks: true });
-
 
   return (
     <article
@@ -63,7 +58,7 @@ export default function PostPage({ params }: PostPageProps) {
 
       <div
         className="prose dark:prose-invert prose-lg max-w-none prose-p:text-foreground/80 prose-headings:font-headline prose-headings:text-foreground prose-img:rounded-lg"
-        dangerouslySetInnerHTML={{ __html: parsedContent }}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
 
       <footer className="mt-12 pt-8 border-t">
