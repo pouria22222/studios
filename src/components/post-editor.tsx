@@ -39,7 +39,7 @@ export function PostEditor() {
         dir="auto"
       />
 
-      <div className="relative group">
+      <div className="relative group reverse-container">
         <div
           contentEditable
           onInput={handleContentChange}

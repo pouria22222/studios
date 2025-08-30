@@ -94,3 +94,12 @@ body {
   direction: auto !important;
   unicode-bidi: plaintext !important;
 }
+
+/* Crazy hack for reversing the text */
+.reverse-container {
+  transform: scaleX(-1);
+}
+
+.reverse-container > * {
+  transform: scaleX(-1);
+}
