@@ -111,12 +111,12 @@ export function PostEditor() {
             onChange={(e) => setTitle(e.target.value)}
             dir="auto"
           />
-        <div className="relative group">
+        <div className="post-editor relative group">
            <div
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px] [unicode-bidi:plaintext]"
+            className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px]"
             dir="auto"
             />
           <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
