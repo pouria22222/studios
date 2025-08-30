@@ -6,12 +6,13 @@ import { voiceToTextArticleCreation } from '@/ai/flows/voice-to-text-article-cre
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { VoiceRecorder } from './voice-recorder';
 import { Loader2, Sparkles, Plus, Image as ImageIcon, Video, Code, List } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/language-provider';
+import { translations } from '@/lib/translations';
 
 export function PostEditor() {
   const [title, setTitle] = useState('');
@@ -20,6 +21,8 @@ export function PostEditor() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = translations[language].postEditor;
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
     setContent(e.currentTarget.innerHTML);
@@ -39,8 +42,8 @@ export function PostEditor() {
     const plainTextContent = content.replace(/<[^>]*>?/gm, '');
     if (!plainTextContent) {
       toast({
-        title: 'محتوا خالی است',
-        description: 'لطفا قبل از اصلاح مقداری محتوا بنویسید.',
+        title: t.contentEmpty,
+        description: t.contentEmptyDesc,
         variant: 'destructive'
       });
       return;
@@ -52,14 +55,14 @@ export function PostEditor() {
       // implementation would be to parse the HTML and refine the text nodes.
       setContent(`<p>${result.refinedBlogPostContent.replace(/\n/g, '</p><p>')}</p>`);
       toast({
-        title: 'محتوا اصلاح شد',
-        description: 'پست وبلاگ شما با موفقیت توسط هوش مصنوعی اصلاح شد.',
+        title: t.contentRefined,
+        description: t.contentRefinedDesc,
       });
     } catch (error) {
-      console.error('خطا در اصلاح پست:', error);
+      console.error('Error refining post:', error);
       toast({
-        title: 'خطا',
-        description: 'اصلاح پست وبلاگ ناموفق بود.',
+        title: t.error,
+        description: t.refineError,
         variant: 'destructive',
       });
     } finally {
@@ -74,14 +77,14 @@ export function PostEditor() {
       const currentContent = content === '<p><br></p>' ? '' : content;
       setContent(`${currentContent}<p>${result.articleDraft}</p>`);
       toast({
-        title: 'صدا رونویسی شد',
-        description: 'صدای ضبط شده شما به متن تبدیل شد.',
+        title: t.voiceTranscribed,
+        description: t.voiceTranscribedDesc,
       });
     } catch (error) {
-      console.error('خطا در رونویسی صدا:', error);
+      console.error('Error transcribing audio:', error);
       toast({
-        title: 'خطا',
-        description: 'رونویسی صدا ناموفق بود.',
+        title: t.error,
+        description: t.transcriptionError,
         variant: 'destructive',
       });
     } finally {
@@ -92,17 +95,17 @@ export function PostEditor() {
   const addElement = (element: 'image' | 'video' | 'code' | 'divider') => {
     // Placeholder function for adding elements
     toast({
-      title: 'قابلیت در دست ساخت',
-      description: `افزودن ${element} هنوز پیاده‌سازی نشده است.`,
+      title: t.wip,
+      description: t.wipDesc(element),
     });
   };
 
   return (
-    <div className="flex gap-8">
+    <div className="flex gap-8" dir={language === 'fa' ? 'rtl' : 'ltr'}>
       <div className="flex-grow">
         <Input
             id="title"
-            placeholder="عنوان"
+            placeholder={t.titlePlaceholder}
             className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto mb-4 placeholder:text-muted-foreground/50"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -119,13 +122,14 @@ export function PostEditor() {
                 <button
                     className={cn(
                     "absolute top-0 -left-12 opacity-0 group-focus-within:opacity-100 transition-opacity p-1 rounded-full border bg-background hover:bg-muted",
-                     showAddMenu && "opacity-100"
+                     showAddMenu && "opacity-100",
+                     language === 'fa' && "right-auto -right-12 left-auto"
                     )}
                 >
                     <Plus className="w-5 h-5" />
                 </button>
             </PopoverTrigger>
-            <PopoverContent side="right" className="w-auto p-1">
+            <PopoverContent side={language === 'fa' ? 'left' : 'right'} className="w-auto p-1">
                 <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => addElement('image')}><ImageIcon className="w-5 h-5" /></Button>
                     <Button variant="ghost" size="icon" onClick={() => addElement('video')}><Video className="w-5 h-5" /></Button>
@@ -140,7 +144,7 @@ export function PostEditor() {
       <div className="w-80 flex-shrink-0">
         <Card>
           <CardHeader>
-            <CardTitle>ابزارهای هوش مصنوعی</CardTitle>
+            <CardTitle>{t.aiTools}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
               <Button onClick={handleRefine} disabled={isRefining || content === '<p><br></p>'} className="w-full">
@@ -149,12 +153,12 @@ export function PostEditor() {
                 ) : (
                   <Sparkles className="mr-2 h-4 w-4" />
                 )}
-                اصلاح با هوش مصنوعی
+                {t.refineWithAI}
               </Button>
             <VoiceRecorder onTranscription={handleTranscription} isLoading={isTranscribing} />
           </CardContent>
           <CardFooter>
-            <Button className="w-full">ذخیره پست</Button>
+            <Button className="w-full">{t.savePost}</Button>
           </CardFooter>
         </Card>
       </div>

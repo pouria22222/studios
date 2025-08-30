@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { PostCard } from '@/components/post-card';
 import type { Post } from '@/types';
 import { Search } from 'lucide-react';
+import { useLanguage } from '@/context/language-provider';
+import { translations } from '@/lib/translations';
 
 interface PostListProps {
   posts: Post[];
@@ -12,6 +14,8 @@ interface PostListProps {
 
 export function PostList({ posts }: PostListProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { language } = useLanguage();
+  const t = translations[language].postList;
 
   const filteredPosts = useMemo(() => {
     if (!searchQuery) {
@@ -29,7 +33,7 @@ export function PostList({ posts }: PostListProps) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search articles..."
+          placeholder={t.searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10 w-full max-w-sm mx-auto"
@@ -43,7 +47,7 @@ export function PostList({ posts }: PostListProps) {
           ))}
         </div>
       ) : (
-        <p className="text-center text-muted-foreground py-16">No articles found. Try a different search term.</p>
+        <p className="text-center text-muted-foreground py-16">{t.noArticles}</p>
       )}
     </div>
   );

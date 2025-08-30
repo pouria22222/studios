@@ -20,6 +20,7 @@ export default {
         body: ['Literata', 'serif'],
         headline: ['Literata', 'serif'],
         code: ['monospace'],
+        persian: ['Vazirmatn', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square, Loader2, MicOff } from 'lucide-react';
+import { useLanguage } from '@/context/language-provider';
+import { translations } from '@/lib/translations';
 
 interface VoiceRecorderProps {
   onTranscription: (audioDataUri: string) => void;
@@ -14,6 +16,9 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const { language } = useLanguage();
+  const t = translations[language].voiceRecorder;
+
 
   useEffect(() => {
     navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permissionStatus) => {
@@ -32,7 +37,7 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
         stream.getTracks().forEach(track => track.stop());
         setHasPermission(true);
        } catch (error) {
-         alert('دسترسی به میکروفون رد شد. لطفاً مجوزها را در تنظیمات مرورگر خود بررسی کنید.');
+         alert(t.micAccessDenied);
          return;
        }
     }
@@ -61,9 +66,9 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('خطا در دسترسی به میکروفون:', error);
+      console.error('Error accessing microphone:', error);
        if (hasPermission) {
-        alert('امکان دسترسی به میکروفون وجود ندارد. لطفاً بررسی کنید که توسط برنامه دیگری استفاده نمی‌شود.');
+        alert(t.micAccessError);
       }
     }
   };
@@ -82,16 +87,16 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
   }
   
   const getHelperText = () => {
-    if (isLoading) return 'در حال رونویسی...';
-    if (isRecording) return 'در حال ضبط...';
-    if (hasPermission === false) return 'مجوز لازم است';
-    return 'برای شروع ضربه بزنید';
+    if (isLoading) return t.transcribing;
+    if (isRecording) return t.recording;
+    if (hasPermission === false) return t.permissionNeeded;
+    return t.tapToStart;
   }
 
   return (
     <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/40">
-      <p className="text-sm font-medium">صدا به متن</p>
-      <p className="text-xs text-muted-foreground text-center">افکار خود را ضبط کنید و اجازه دهید هوش مصنوعی پست شما را پیش‌نویس کند.</p>
+      <p className="text-sm font-medium">{t.title}</p>
+      <p className="text-xs text-muted-foreground text-center">{t.description}</p>
       {isRecording ? (
         <Button onClick={handleStopRecording} variant="destructive" size="icon" className="w-16 h-16 rounded-full">
           <Square className="h-8 w-8" />

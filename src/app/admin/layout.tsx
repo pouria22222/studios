@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { LayoutDashboard, PlusCircle, GalleryHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { LanguageSwitcher } from '@/components/language-switcher';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
