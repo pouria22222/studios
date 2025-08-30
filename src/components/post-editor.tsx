@@ -78,7 +78,6 @@ export function PostEditor() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           dir="auto"
-          style={{ unicodeBidi: 'plaintext' }}
         />
 
         <div className="post-editor relative group">
@@ -88,9 +87,7 @@ export function PostEditor() {
             dangerouslySetInnerHTML={{ __html: content }}
             className={cn(
               'max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4',
-              'prose dark:prose-invert',
-              '[direction:unset]',
-              '[unicode-bidi:plaintext]'
+              'prose dark:prose-invert'
             )}
             dir="auto"
             suppressContentEditableWarning
