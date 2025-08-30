@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { translations } from '@/lib/translations';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/components/theme-provider';
 
 export function PostEditor() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('<p><br></p>');
   const { toast } = useToast();
   const t = translations.postEditor;
+  const { theme } = useTheme();
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
     setContent(e.currentTarget.innerHTML);
@@ -24,6 +26,12 @@ export function PostEditor() {
       description: "در یک برنامه واقعی، این پست به پایگاه داده ارسال می‌شد.",
     });
   };
+
+  const editorStyle: React.CSSProperties = {
+    color: theme === 'dark' ? 'hsl(var(--foreground))' : 'hsl(var(--foreground))',
+    backgroundColor: theme === 'dark' ? 'hsl(var(--card))' : 'hsl(var(--card))',
+  };
+
 
   return (
     <div className="space-y-6">
@@ -39,7 +47,8 @@ export function PostEditor() {
         contentEditable
         onInput={handleContentChange}
         dangerouslySetInnerHTML={{ __html: content }}
-        className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
+        className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
+        style={editorStyle}
         dir="auto"
         suppressContentEditableWarning
       />
