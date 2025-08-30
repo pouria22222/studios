@@ -83,7 +83,8 @@ body {
 /* =========================================================
    FIX FOR CONTENTEDITABLE BIDI ISSUE
    ========================================================= */
-.post-editor [contenteditable] {
+.post-editor [contenteditable],
+.post-editor #title {
   direction: auto !important;
   unicode-bidi: plaintext !important;
   text-align: start !important;
@@ -92,10 +93,4 @@ body {
 .post-editor [contenteditable] * {
   direction: auto !important;
   unicode-bidi: plaintext !important;
-}
-
-#title {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-  text-align: start;
 }
