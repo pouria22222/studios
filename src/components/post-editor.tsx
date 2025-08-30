@@ -101,7 +101,7 @@ export function PostEditor() {
   };
 
   return (
-    <div className="flex gap-8" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col md:flex-row gap-8">
       <div className="flex-grow">
         <Input
             id="title"
@@ -143,7 +143,7 @@ export function PostEditor() {
         </div>
       </div>
 
-      <div className="w-80 flex-shrink-0">
+      <div className="w-full md:w-80 flex-shrink-0">
         <Card>
           <CardHeader>
             <CardTitle>{t.aiTools}</CardTitle>
