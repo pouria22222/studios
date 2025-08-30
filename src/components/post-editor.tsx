@@ -13,6 +13,7 @@ export function PostEditor() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('<p><br></p>');
   const [showAddMenu, setShowAddMenu] = useState(false);
+  const [isEditorFocused, setIsEditorFocused] = useState(false);
   const { toast } = useToast();
   const t = translations.postEditor;
 
@@ -28,6 +29,8 @@ export function PostEditor() {
   const addElement = (el: 'image' | 'video' | 'code' | 'divider') =>
     toast({ title: t.wip, description: t.wipDesc(el) });
 
+  const showPlusButton = isEditorFocused || showAddMenu;
+
   return (
     <div className="space-y-6 post-editor" dir="auto">
       <Input
@@ -39,10 +42,12 @@ export function PostEditor() {
         dir="auto"
       />
 
-      <div className="relative group">
+      <div className="relative">
         <div
           contentEditable
           onInput={handleContentChange}
+          onFocus={() => setIsEditorFocused(true)}
+          onBlur={() => setIsEditorFocused(false)}
           dangerouslySetInnerHTML={{ __html: content }}
           className="focus:outline-none text-lg min-h-[400px]"
           dir="auto"
@@ -52,8 +57,8 @@ export function PostEditor() {
           <PopoverTrigger asChild>
             <button
               className={cn(
-                'absolute top-0 -right-12 opacity-0 group-focus-within:opacity-100 transition-opacity p-1 rounded-full border bg-background hover:bg-muted',
-                showAddMenu && 'opacity-100'
+                'absolute top-0 -right-12 opacity-0 transition-opacity p-1 rounded-full border bg-background hover:bg-muted',
+                showPlusButton && 'opacity-100'
               )}
             >
               <Plus className="w-5 h-5" />
