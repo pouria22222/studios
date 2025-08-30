@@ -79,27 +79,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-
-/* =========================================================
-   FIX FOR CONTENTEDITABLE BIDI ISSUE
-   ========================================================= */
-.post-editor [contenteditable],
-.post-editor #title {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-  text-align: start !important;
-}
-
-.post-editor [contenteditable] * {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-}
-
-/* Crazy hack for reversing the text */
-.reverse-container {
-  transform: scaleX(-1);
-}
-
-.reverse-container > * {
-  transform: scaleX(-1);
-}

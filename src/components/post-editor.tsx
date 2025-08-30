@@ -36,16 +36,17 @@ export function PostEditor() {
         className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto placeholder:text-muted-foreground/50"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        dir="auto"
+        dir="rtl"
       />
 
-      <div className="relative group reverse-container">
+      <div className="relative group">
         <div
           contentEditable
           onInput={handleContentChange}
           dangerouslySetInnerHTML={{ __html: content }}
           className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
-          dir="auto"
+          dir="rtl"
+          style={{ unicodeBidi: 'embed' }}
           suppressContentEditableWarning
         />
         <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
