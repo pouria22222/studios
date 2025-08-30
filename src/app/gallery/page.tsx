@@ -72,7 +72,7 @@ export default function GalleryPage() {
             onClick={() => setSelectedImage(image)}
           >
             <Card className="overflow-hidden h-full flex flex-col">
-              <CardContent className="p-0 aspect-w-4 aspect-h-3 relative">
+              <CardContent className="p-0 relative" style={{ paddingBottom: '75%' }}>
                 <Image
                   src={image.src}
                   alt={image.alt}
