@@ -13,20 +13,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" dir={language === 'fa' ? 'rtl' : 'ltr'}>
       <div className="container flex h-14 items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <span className="font-bold font-headline text-lg">{t.header.title}</span>
           </Link>
-          <nav className="flex items-center space-x-6 text-sm font-medium">
-            <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {t.header.blog}
-            </Link>
-            <Link href="/gallery" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {t.header.gallery}
-            </Link>
-          </nav>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium mx-6">
+          <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            {t.header.blog}
+          </Link>
+          <Link href="/gallery" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            {t.header.gallery}
+          </Link>
+        </nav>
+
+        <div className="flex flex-1 items-center justify-end space-x-2 rtl:space-x-reverse">
            <Button asChild variant="outline">
               <Link href="/admin">{t.header.admin}</Link>
             </Button>

@@ -13,6 +13,16 @@ export const translations = {
       title: 'From My Nook',
       subtitle: 'A collection of thoughts, stories, and ideas.',
     },
+    gallery: {
+      title: 'Gallery',
+      subtitle: 'A collection of moments and inspirations.',
+      categories: {
+        all: 'All',
+        nature: 'Nature',
+        urban: 'Urban',
+        art: 'Art',
+      }
+    },
     postList: {
       searchPlaceholder: 'Search articles...',
       noArticles: 'No articles found. Try a different search term.',
@@ -58,6 +68,16 @@ export const translations = {
     home: {
       title: 'از کنج دنج من',
       subtitle: 'مجموعه‌ای از افکار، داستان‌ها و ایده‌ها.',
+    },
+    gallery: {
+      title: 'گالری',
+      subtitle: 'مجموعه‌ای از لحظات و الهامات.',
+      categories: {
+        all: 'همه',
+        nature: 'طبیعت',
+        urban: 'شهری',
+        art: 'هنر',
+      }
     },
     postList: {
       searchPlaceholder: 'جستجوی مقالات...',
