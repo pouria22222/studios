@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, Square, Loader2 } from 'lucide-react';
+import { Mic, Square, Loader2, MicOff } from 'lucide-react';
 
 interface VoiceRecorderProps {
   onTranscription: (audioDataUri: string) => void;
@@ -11,10 +11,32 @@ interface VoiceRecorderProps {
 
 export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps) {
   const [isRecording, setIsRecording] = useState(false);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
+  useEffect(() => {
+    navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permissionStatus) => {
+      setHasPermission(permissionStatus.state === 'granted');
+      permissionStatus.onchange = () => {
+        setHasPermission(permissionStatus.state === 'granted');
+      };
+    });
+  }, []);
+
+
   const handleStartRecording = async () => {
+    if (hasPermission === false) {
+       try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop());
+        setHasPermission(true);
+       } catch (error) {
+         alert('دسترسی به میکروفون رد شد. لطفاً مجوزها را در تنظیمات مرورگر خود بررسی کنید.');
+         return;
+       }
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -39,8 +61,10 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Could not access microphone. Please check your browser permissions.');
+      console.error('خطا در دسترسی به میکروفون:', error);
+       if (hasPermission) {
+        alert('امکان دسترسی به میکروفون وجود ندارد. لطفاً بررسی کنید که توسط برنامه دیگری استفاده نمی‌شود.');
+      }
     }
   };
 
@@ -50,26 +74,35 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
       setIsRecording(false);
     }
   };
+  
+  const getButtonContent = () => {
+      if (isLoading) return <Loader2 className="h-8 w-8 animate-spin" />;
+      if (hasPermission === false) return <MicOff className="h-8 w-8" />;
+      return <Mic className="h-8 w-8" />;
+  }
+  
+  const getHelperText = () => {
+    if (isLoading) return 'در حال رونویسی...';
+    if (isRecording) return 'در حال ضبط...';
+    if (hasPermission === false) return 'مجوز لازم است';
+    return 'برای شروع ضربه بزنید';
+  }
 
   return (
     <div className="flex flex-col items-center gap-2 p-4 border rounded-lg bg-muted/40">
-      <p className="text-sm font-medium">Voice to Text</p>
-      <p className="text-xs text-muted-foreground text-center">Record your thoughts and let AI draft your post.</p>
+      <p className="text-sm font-medium">صدا به متن</p>
+      <p className="text-xs text-muted-foreground text-center">افکار خود را ضبط کنید و اجازه دهید هوش مصنوعی پست شما را پیش‌نویس کند.</p>
       {isRecording ? (
         <Button onClick={handleStopRecording} variant="destructive" size="icon" className="w-16 h-16 rounded-full">
           <Square className="h-8 w-8" />
         </Button>
       ) : (
-        <Button onClick={handleStartRecording} disabled={isLoading} size="icon" className="w-16 h-16 rounded-full">
-          {isLoading ? (
-            <Loader2 className="h-8 w-8 animate-spin" />
-          ) : (
-            <Mic className="h-8 w-8" />
-          )}
+        <Button onClick={handleStartRecording} disabled={isLoading || hasPermission === null} size="icon" className="w-16 h-16 rounded-full">
+         {getButtonContent()}
         </Button>
       )}
       <p className="text-xs text-muted-foreground mt-1">
-        {isLoading ? 'Transcribing...' : isRecording ? 'Recording...' : 'Tap to start'}
+        {getHelperText()}
       </p>
     </div>
   );
