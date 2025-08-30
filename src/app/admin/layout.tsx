@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, PlusCircle, GalleryHorizontal } from 'lucide-react';
-import { LanguageSwitcher } from '@/components/language-switcher';
+import { LayoutDashboard, PlusCircle, GalleryHorizontal, Settings } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -35,6 +34,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               >
                 <GalleryHorizontal className="h-4 w-4" />
                 Manage Gallery
+              </Link>
+              <Link
+                href="/admin/settings"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Settings className="h-4 w-4" />
+                Settings
               </Link>
             </nav>
           </div>

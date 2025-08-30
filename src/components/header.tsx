@@ -19,12 +19,15 @@ export function Header() {
           </Link>
         </div>
         
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium mx-6">
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium mx-auto">
           <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
             {t.header.blog}
           </Link>
           <Link href="/gallery" className="transition-colors hover:text-foreground/80 text-foreground/60">
             {t.header.gallery}
+          </Link>
+          <Link href="/contact" className="transition-colors hover:text-foreground/80 text-foreground/60">
+            {t.header.contact}
           </Link>
         </nav>
 

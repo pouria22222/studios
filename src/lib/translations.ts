@@ -4,6 +4,7 @@ export const translations = {
       title: "Nazy's Nook",
       blog: 'Blog',
       gallery: 'Gallery',
+      contact: 'Contact',
       admin: 'Admin Panel',
     },
     footer: {
@@ -22,6 +23,23 @@ export const translations = {
         urban: 'Urban',
         art: 'Art',
       }
+    },
+    contact: {
+      title: 'Contact Me',
+      subtitle: 'Feel free to reach out.',
+      cardTitle: 'Get in Touch',
+      emailLabel: 'Email',
+      instagramLabel: 'Instagram',
+    },
+    settings: {
+      title: 'Settings',
+      cardTitle: 'Contact Information',
+      cardDescription: 'Update your public contact details.',
+      emailLabel: 'Email Address',
+      instagramLabel: 'Instagram Handle',
+      saveButton: 'Save Changes',
+      saveSuccessTitle: 'Settings Saved',
+      saveSuccessDesc: 'Your contact information has been updated.',
     },
     postList: {
       searchPlaceholder: 'Search articles...',
@@ -60,6 +78,7 @@ export const translations = {
       title: 'کنج دنج نازی',
       blog: 'وبلاگ',
       gallery: 'گالری',
+      contact: 'ارتباط با من',
       admin: 'پنل مدیریت',
     },
     footer: {
@@ -78,6 +97,23 @@ export const translations = {
         urban: 'شهری',
         art: 'هنر',
       }
+    },
+    contact: {
+      title: 'ارتباط با من',
+      subtitle: 'برای ارتباط با من راحت باشید.',
+      cardTitle: 'راه‌های ارتباطی',
+      emailLabel: 'ایمیل',
+      instagramLabel: 'اینستاگرام',
+    },
+    settings: {
+      title: 'تنظیمات',
+      cardTitle: 'اطلاعات تماس',
+      cardDescription: 'اطلاعات تماس عمومی خود را به‌روز کنید.',
+      emailLabel: 'آدرس ایمیل',
+      instagramLabel: 'نام کاربری اینستاگرام',
+      saveButton: 'ذخیره تغییرات',
+      saveSuccessTitle: 'تنظیمات ذخیره شد',
+      saveSuccessDesc: 'اطلاعات تماس شما با موفقیت به‌روز شد.',
     },
     postList: {
       searchPlaceholder: 'جستجوی مقالات...',

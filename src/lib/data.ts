@@ -1,4 +1,4 @@
-import type { Post, GalleryImage } from '@/types';
+import type { Post, GalleryImage, Settings } from '@/types';
 
 const posts: Post[] = [
   {
@@ -52,7 +52,21 @@ const galleryImages: GalleryImage[] = [
     { id: '6', src: 'https://picsum.photos/seed/g6/800/600', hint: 'wildlife photography', alt: 'A close-up shot of a fox in the wild', caption: 'Curious fox', category: 'Nature' },
 ];
 
+let settings: Settings = {
+  email: 'nazy.hosseini@example.com',
+  instagram: 'nazy.h',
+};
+
 export const getPosts = (): Post[] => posts;
 export const getPostById = (id: string): Post | undefined => posts.find(post => post.id === id);
 
 export const getGalleryImages = (): GalleryImage[] => galleryImages;
+
+export const getSettings = (): Settings => settings;
+
+// Note: In a real app, this would update a database.
+// Here, it only updates the in-memory object, so changes will be lost on server restart.
+export const updateSettings = (newSettings: Partial<Settings>): Settings => {
+  settings = { ...settings, ...newSettings };
+  return settings;
+}

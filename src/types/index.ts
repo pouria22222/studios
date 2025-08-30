@@ -17,3 +17,8 @@ export interface GalleryImage {
   caption: string;
   category: string;
 }
+
+export interface Settings {
+  email: string;
+  instagram: string;
+}
