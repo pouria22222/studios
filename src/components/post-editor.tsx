@@ -17,10 +17,6 @@ export function PostEditor() {
   const t = translations.postEditor;
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
-    const text = e.currentTarget.textContent;
-    console.log('Text content:', text);
-    console.log('HTML content:', e.currentTarget.innerHTML);
-    
     setContent(e.currentTarget.innerHTML);
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
@@ -33,7 +29,7 @@ export function PostEditor() {
     toast({ title: t.wip, description: t.wipDesc(el) });
 
   return (
-    <div className="space-y-6 post-editor">
+    <div className="space-y-6 post-editor" dir="auto">
       <Input
         id="title"
         placeholder={t.titlePlaceholder}
@@ -49,12 +45,7 @@ export function PostEditor() {
           onInput={handleContentChange}
           dangerouslySetInnerHTML={{ __html: content }}
           className="focus:outline-none text-lg min-h-[400px]"
-          dir="ltr"
-          style={{
-            transform: 'scaleX(1) !important',
-            direction: 'ltr !important',
-            writingMode: 'horizontal-tb !important'
-          }}
+          dir="auto"
           suppressContentEditableWarning
         />
         <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
