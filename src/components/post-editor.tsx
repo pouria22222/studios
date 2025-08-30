@@ -8,10 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/lib/translations';
 import { refineBlogPostWithAI } from '@/ai/flows/refine-blog-post-with-ai';
 import { voiceToTextArticleCreation } from '@/ai/flows/voice-to-text-article-creation';
-import { Loader2, Wand2, Image as ImageIcon, UploadCloud, Bold, Italic, Link as LinkIcon, Heading2, Heading3 } from 'lucide-react';
+import { Loader2, Wand2, Image as ImageIcon, UploadCloud, Bold, Italic, Link as LinkIcon, Heading2, Heading3, RemoveFormatting } from 'lucide-react';
 import { VoiceRecorder } from './voice-recorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import Image from 'next/image';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export function PostEditor() {
   const [title, setTitle] = useState('');
@@ -20,13 +21,16 @@ export function PostEditor() {
   const [isLoading, setIsLoading] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+  const [isLinkEditorOpen, setIsLinkEditorOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+
 
   const { toast } = useToast();
   const t = translations.postEditor;
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const contentImageInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
-  const selectionRef = useRef<Selection | null>(null);
+  const selectionRef = useRef<Range | null>(null);
 
 
   const handleContentChange = useCallback(() => {
@@ -42,46 +46,59 @@ export function PostEditor() {
     }
   }, [content]);
 
+  const saveSelection = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      selectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+  }, []);
+
+  const restoreSelection = useCallback(() => {
+    if (selectionRef.current) {
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(selectionRef.current);
+      }
+    }
+  }, []);
+
+
   const handleSelection = useCallback(() => {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-      selectionRef.current = selection;
+      saveSelection();
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       if (editorRef.current) {
         const editorRect = editorRef.current.getBoundingClientRect();
         setToolbarPosition({
-          top: rect.top - editorRect.top - 40, // Position toolbar above selection
-          left: rect.left - editorRect.left + rect.width / 2 - 100, // Center toolbar
+          top: rect.top - editorRect.top - 50, // Position toolbar above selection
+          left: rect.left - editorRect.left + rect.width / 2, // Center toolbar
         });
         setShowToolbar(true);
       }
     } else {
       setShowToolbar(false);
     }
-  }, []);
+  }, [saveSelection]);
 
   useEffect(() => {
     const editor = editorRef.current;
-    if (editor) {
-      const handleMouseUp = () => setTimeout(handleSelection, 0);
-      editor.addEventListener('mouseup', handleMouseUp);
-      editor.addEventListener('keyup', handleSelection);
-      
-      const handleBlur = () => {
-         // Use a timeout to allow click events on the toolbar to register
-        setTimeout(() => {
-            if (document.activeElement !== editorRef.current) {
-                 setShowToolbar(false);
-            }
-        }, 200)
-      };
+    const handleMouseUp = () => setTimeout(handleSelection, 0);
+    const handleKeyUp = (e: KeyboardEvent) => {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            setTimeout(handleSelection, 0);
+        }
+    };
 
-      editor.addEventListener('focusout', handleBlur);
+    if (editor) {
+      editor.addEventListener('mouseup', handleMouseUp);
+      editor.addEventListener('keyup', handleKeyUp);
+      
       return () => {
         editor.removeEventListener('mouseup', handleMouseUp);
-        editor.removeEventListener('keyup', handleSelection);
-        editor.removeEventListener('focusout', handleBlur);
+        editor.removeEventListener('keyup', handleKeyUp);
       };
     }
   }, [handleSelection]);
@@ -98,17 +115,24 @@ export function PostEditor() {
   const handleFormat = (command: string, value?: string) => {
     document.execCommand(command, false, value);
     editorRef.current?.focus();
-    setShowToolbar(false);
     handleContentChange();
   };
 
   const handleLink = () => {
-    const url = prompt('آدرس لینک را وارد کنید:');
-    if (url) {
-      handleFormat('createLink', url);
+    restoreSelection();
+    if (linkUrl) {
+        handleFormat('createLink', linkUrl);
     }
+    setLinkUrl('');
+    setIsLinkEditorOpen(false);
+    setShowToolbar(false);
   };
-
+  
+  const handleClearFormatting = () => {
+    handleFormat('removeFormat');
+    handleFormat('formatBlock', '<p>');
+    setShowToolbar(false);
+  };
 
   const handleRefineWithAI = async () => {
     const currentContent = editorRef.current?.innerHTML || '';
@@ -228,25 +252,60 @@ export function PostEditor() {
             <div className="relative">
               {showToolbar && (
                 <div
-                  className="absolute z-10 bg-background border rounded-md shadow-md p-1 flex gap-1"
-                  style={{ top: `${toolbarPosition.top}px`, left: `${toolbarPosition.left}px` }}
+                  className="absolute z-10 bg-background border rounded-md shadow-md p-1 flex items-center gap-1"
+                  style={{
+                    top: `${toolbarPosition.top}px`,
+                    left: `${toolbarPosition.left}px`,
+                    transform: 'translateX(-50%)',
+                  }}
                   onMouseDown={(e) => e.preventDefault()} // Prevent editor from losing focus
                 >
-                  <Button variant="ghost" size="icon" onClick={() => handleFormat('bold')}>
+                  <Button variant="ghost" size="icon" onMouseDown={() => handleFormat('bold')}>
                     <Bold className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleFormat('italic')}>
+                  <Button variant="ghost" size="icon" onMouseDown={() => handleFormat('italic')}>
                     <Italic className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={handleLink}>
-                    <LinkIcon className="w-4 h-4" />
-                  </Button>
-                   <div className="border-l mx-1"></div>
-                  <Button variant="ghost" size="icon" onClick={() => handleFormat('formatBlock', '<h2>')}>
+                  
+                  <Popover open={isLinkEditorOpen} onOpenChange={setIsLinkEditorOpen}>
+                    <PopoverTrigger asChild>
+                       <Button variant="ghost" size="icon" onClick={saveSelection}>
+                          <LinkIcon className="w-4 h-4" />
+                       </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                        <div className="flex gap-2">
+                            <Input 
+                                type="url" 
+                                placeholder="https://example.com" 
+                                value={linkUrl} 
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                                className="h-8"
+                                onKeyDown={(e) => {
+                                    if(e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleLink();
+                                    }
+                                }}
+                            />
+                            <Button size="sm" onClick={handleLink}>اعمال</Button>
+                        </div>
+                    </PopoverContent>
+                  </Popover>
+
+                   <div className="border-l mx-1 h-6"></div>
+
+                  <Button variant="ghost" size="icon" onMouseDown={() => handleFormat('formatBlock', '<h2>')}>
                     <Heading2 className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleFormat('formatBlock', '<h3>')}>
+                  <Button variant="ghost" size="icon" onMouseDown={() => handleFormat('formatBlock', '<h3>')}>
                     <Heading3 className="w-4 h-4" />
+                  </Button>
+
+                  <div className="border-l mx-1 h-6"></div>
+                  
+                  <Button variant="ghost" size="icon" onMouseDown={handleClearFormatting}>
+                    <RemoveFormatting className="w-4 h-4" />
                   </Button>
                 </div>
               )}
