@@ -109,6 +109,7 @@ export function PostEditor() {
             className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto mb-4 placeholder:text-muted-foreground/50"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            dir="auto"
           />
         <div className="relative group">
            <div
@@ -116,6 +117,7 @@ export function PostEditor() {
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
             className="prose dark:prose-invert max-w-none focus:outline-none text-lg min-h-[400px]"
+            dir="auto"
             />
           <Popover open={showAddMenu} onOpenChange={setShowAddMenu}>
             <PopoverTrigger asChild>
