@@ -52,7 +52,7 @@ export function PostEditor() {
         const editorRect = editorRef.current.getBoundingClientRect();
         setToolbarPosition({
           top: rect.top - editorRect.top - 40, // Position toolbar above selection
-          left: rect.left - editorRect.left + rect.width / 2 - 50, // Center toolbar
+          left: rect.left - editorRect.left + rect.width / 2 - 100, // Center toolbar
         });
         setShowToolbar(true);
       }
@@ -64,13 +64,24 @@ export function PostEditor() {
   useEffect(() => {
     const editor = editorRef.current;
     if (editor) {
-      editor.addEventListener('mouseup', handleSelection);
+      const handleMouseUp = () => setTimeout(handleSelection, 0);
+      editor.addEventListener('mouseup', handleMouseUp);
       editor.addEventListener('keyup', handleSelection);
-      editor.addEventListener('focusout', () => setShowToolbar(false)); // Hide on blur
+      
+      const handleBlur = () => {
+         // Use a timeout to allow click events on the toolbar to register
+        setTimeout(() => {
+            if (document.activeElement !== editorRef.current) {
+                 setShowToolbar(false);
+            }
+        }, 200)
+      };
+
+      editor.addEventListener('focusout', handleBlur);
       return () => {
-        editor.removeEventListener('mouseup', handleSelection);
+        editor.removeEventListener('mouseup', handleMouseUp);
         editor.removeEventListener('keyup', handleSelection);
-        editor.removeEventListener('focusout', () => setShowToolbar(false));
+        editor.removeEventListener('focusout', handleBlur);
       };
     }
   }, [handleSelection]);
@@ -188,7 +199,7 @@ export function PostEditor() {
                   <div className="relative aspect-video rounded-md overflow-hidden group">
                     <Image src={mainImage} alt="پیش نمایش تصویر شاخص" fill className="object-cover" />
                     <div 
-                      className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       onClick={() => mainImageInputRef.current?.click()}
                     >
                       <Button variant="secondary">تغییر تصویر</Button>
@@ -289,5 +300,3 @@ export function PostEditor() {
     </div>
   );
 }
-
-    

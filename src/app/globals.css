@@ -3,6 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Explicitly import prose styles to ensure they are generated */
+@import "./prose-styles.css";
+
 /* ---------- فونت پایه ---------- */
 body {
   /* استک سیستم (ظاهر شبیه اپل) */
