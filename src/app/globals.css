@@ -81,7 +81,7 @@ body {
 }
 
 /* =========================================================
-   رفع قطعی وارونگی متن در ادیتورهای contentEditable
+   FIX FOR CONTENTEDITABLE BIDI ISSUE
    ========================================================= */
 .post-editor [contenteditable] {
   direction: auto !important;

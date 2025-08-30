@@ -76,7 +76,6 @@ export function PostEditor() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           dir="auto"
-          style={{ unicodeBidi: 'plaintext', direction: 'unset', textAlign: 'start' }}
         />
 
         <div className="relative group">
@@ -84,7 +83,7 @@ export function PostEditor() {
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4 [direction:unset] [unicode-bidi:plaintext]"
+            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
             dir="auto"
             suppressContentEditableWarning
           />
