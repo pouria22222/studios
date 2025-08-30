@@ -17,6 +17,10 @@ export function PostEditor() {
   const t = translations.postEditor;
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
+    const text = e.currentTarget.textContent;
+    console.log('Text content:', text);
+    console.log('HTML content:', e.currentTarget.innerHTML);
+    
     setContent(e.currentTarget.innerHTML);
     const sel = window.getSelection();
     if (sel && sel.rangeCount > 0) {
@@ -44,7 +48,7 @@ export function PostEditor() {
           contentEditable
           onInput={handleContentChange}
           dangerouslySetInnerHTML={{ __html: content }}
-          className="focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
+          className="focus:outline-none text-lg min-h-[400px]"
           dir="ltr"
           style={{
             transform: 'scaleX(1) !important',
