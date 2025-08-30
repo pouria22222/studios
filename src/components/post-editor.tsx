@@ -50,6 +50,8 @@ export function PostEditor() {
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       selectionRef.current = selection.getRangeAt(0).cloneRange();
+    } else {
+      selectionRef.current = null;
     }
   }, []);
 
@@ -65,9 +67,9 @@ export function PostEditor() {
 
 
   const handleSelection = useCallback(() => {
+    saveSelection(); // Always save selection on mouse up
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-      saveSelection();
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       if (editorRef.current) {
@@ -85,23 +87,28 @@ export function PostEditor() {
 
   useEffect(() => {
     const editor = editorRef.current;
+    if (!editor) return;
+
     const handleMouseUp = () => setTimeout(handleSelection, 0);
     const handleKeyUp = (e: KeyboardEvent) => {
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Backspace' || e.key === 'Delete') {
             setTimeout(handleSelection, 0);
         }
     };
+    const handleFocus = () => saveSelection();
 
-    if (editor) {
-      editor.addEventListener('mouseup', handleMouseUp);
-      editor.addEventListener('keyup', handleKeyUp);
-      
-      return () => {
-        editor.removeEventListener('mouseup', handleMouseUp);
-        editor.removeEventListener('keyup', handleKeyUp);
-      };
-    }
-  }, [handleSelection]);
+    editor.addEventListener('mouseup', handleMouseUp);
+    editor.addEventListener('keyup', handleKeyUp);
+    editor.addEventListener('focus', handleFocus);
+    editor.addEventListener('mousedown', saveSelection); // Save selection on mousedown as well
+    
+    return () => {
+      editor.removeEventListener('mouseup', handleMouseUp);
+      editor.removeEventListener('keyup', handleKeyUp);
+      editor.removeEventListener('focus', handleFocus);
+      editor.removeEventListener('mousedown', saveSelection);
+    };
+  }, [handleSelection, saveSelection]);
 
 
   const handleSave = () => {
@@ -113,9 +120,11 @@ export function PostEditor() {
   };
   
   const handleFormat = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
+    restoreSelection();
     editorRef.current?.focus();
+    document.execCommand(command, false, value);
     handleContentChange();
+    setShowToolbar(false);
   };
 
   const handleLink = () => {
@@ -129,8 +138,14 @@ export function PostEditor() {
   };
   
   const handleClearFormatting = () => {
-    handleFormat('removeFormat');
-    handleFormat('formatBlock', '<p>');
+    restoreSelection();
+    if (selectionRef.current) {
+        const selectedText = selectionRef.current.toString();
+        // This is a simplified clear formatting. A more robust solution might involve more complex DOM manipulation.
+        handleFormat('removeFormat');
+        // Re-wrap in a p tag if it's now just plain text in the root
+        document.execCommand('formatBlock', false, 'p');
+    }
     setShowToolbar(false);
   };
 
@@ -196,6 +211,7 @@ export function PostEditor() {
     if (editorRef.current) {
       const imgHtml = `<img src="${url}" alt="تصویر درج شده" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />`;
       editorRef.current.focus();
+      restoreSelection();
       document.execCommand('insertHTML', false, imgHtml);
       handleContentChange();
     }
@@ -269,7 +285,12 @@ export function PostEditor() {
                   
                   <Popover open={isLinkEditorOpen} onOpenChange={setIsLinkEditorOpen}>
                     <PopoverTrigger asChild>
-                       <Button variant="ghost" size="icon" onClick={saveSelection}>
+                       <Button variant="ghost" size="icon" onClick={() => {
+                        saveSelection();
+                        const selection = window.getSelection();
+                        const existingLink = selection?.focusNode?.parentElement?.closest('a');
+                        setLinkUrl(existingLink?.href || '');
+                       }}>
                           <LinkIcon className="w-4 h-4" />
                        </Button>
                     </PopoverTrigger>
@@ -313,6 +334,8 @@ export function PostEditor() {
                 ref={editorRef}
                 contentEditable
                 onBlur={handleContentChange}
+                onMouseUp={handleSelection}
+                onKeyUp={handleSelection}
                 className="prose dark:prose-invert prose-lg max-w-none min-h-[500px] border rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent"
                 dir="auto"
                 suppressContentEditableWarning
