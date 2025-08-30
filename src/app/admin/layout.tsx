@@ -7,17 +7,15 @@ import {
   GalleryHorizontal,
   Settings,
 } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const { language } = useLanguage();
-  const t = translations[language].admin;
+  const t = translations.admin;
 
   return (
     <div
       className="grid min-h-[calc(100vh-theme(spacing.14))] md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]"
-      dir={language === 'fa' ? 'rtl' : 'ltr'}
+      dir="rtl"
     >
       <aside className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">

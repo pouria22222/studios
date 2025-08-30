@@ -6,12 +6,6 @@
 /* ---------- فونت پایه ---------- */
 body {
   /* استک سیستم (ظاهر شبیه اپل) */
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol", sans-serif;
-}
-/* اگر کلاس فارسی‌ساز دادی */
-body.font-persian {
   font-family: "Vazirmatn", ui-sans-serif, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
@@ -89,12 +83,7 @@ body.font-persian {
 /* =========================================================
    رفع قطعی وارونگی متن در ادیتورهای contentEditable
    ========================================================= */
-.post-editor [contenteditable] {
-  direction: auto !important;
-  unicode-bidi: plaintext !important;
-  text-align: start;
-}
-
+.post-editor [contenteditable],
 .post-editor [contenteditable] * {
   direction: auto !important;
   unicode-bidi: plaintext !important;

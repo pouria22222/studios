@@ -11,7 +11,6 @@ import { VoiceRecorder } from './voice-recorder';
 import { Loader2, Sparkles, Plus, Image as ImageIcon, Video, Code, List } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export function PostEditor() {
@@ -21,8 +20,7 @@ export function PostEditor() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const { toast } = useToast();
-  const { language } = useLanguage();
-  const t = translations[language].postEditor;
+  const t = translations.postEditor;
 
   const handleContentChange = (e: React.FormEvent<HTMLDivElement>) => {
     setContent(e.currentTarget.innerHTML);
@@ -70,24 +68,21 @@ export function PostEditor() {
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
-      <div className="flex-grow">
+      <div className="flex-grow post-editor">
         <Input
+          dir="auto"
           placeholder={t.titlePlaceholder}
           className="text-4xl font-bold border-none shadow-none focus-visible:ring-0 h-auto mb-4 placeholder:text-muted-foreground/50"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          dir="auto"
         />
 
-        <div className="post-editor relative group">
+        <div className="relative group">
           <div
             contentEditable
             onInput={handleContentChange}
             dangerouslySetInnerHTML={{ __html: content }}
-            className={cn(
-              'max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4',
-              'prose dark:prose-invert'
-            )}
+            className="max-w-none focus:outline-none text-lg min-h-[400px] border rounded-md p-4"
             dir="auto"
             suppressContentEditableWarning
           />
@@ -95,15 +90,14 @@ export function PostEditor() {
             <PopoverTrigger asChild>
               <button
                 className={cn(
-                  'absolute top-0 -left-12 opacity-0 group-focus-within:opacity-100 transition-opacity p-1 rounded-full border bg-background hover:bg-muted',
-                  showAddMenu && 'opacity-100',
-                  language === 'fa' && 'right-auto -right-12 left-auto'
+                  'absolute top-0 -right-12 opacity-0 group-focus-within:opacity-100 transition-opacity p-1 rounded-full border bg-background hover:bg-muted',
+                  showAddMenu && 'opacity-100'
                 )}
               >
                 <Plus className="w-5 h-5" />
               </button>
             </PopoverTrigger>
-            <PopoverContent side={language === 'fa' ? 'left' : 'right'} className="w-auto p-1">
+            <PopoverContent side="left" className="w-auto p-1">
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => addElement('image')}><ImageIcon className="w-5 h-5" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => addElement('video')}><Video className="w-5 h-5" /></Button>

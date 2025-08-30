@@ -1,21 +1,17 @@
-'use client';
-
 import Link from 'next/link';
 import { getPosts } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export default function AdminDashboardPage() {
   const posts = getPosts();
-  const { language } = useLanguage();
-  const t = translations[language].admin;
+  const t = translations.admin;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir="rtl">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-headline font-bold">{t.dashboard}</h1>
         <Button asChild>
@@ -27,26 +23,26 @@ export default function AdminDashboardPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Blog Posts</CardTitle>
-          <CardDescription>Manage your existing blog posts.</CardDescription>
+          <CardTitle>پست‌های وبلاگ</CardTitle>
+          <CardDescription>پست‌های وبلاگ موجود خود را مدیریت کنید.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>عنوان</TableHead>
+                <TableHead>تاریخ</TableHead>
+                <TableHead>عملیات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {posts.map((post) => (
                 <TableRow key={post.id}>
-                  <TableCell className="font-medium">{post.title[language]}</TableCell>
-                  <TableCell>{new Date(post.date).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US')}</TableCell>
+                  <TableCell className="font-medium">{post.title}</TableCell>
+                  <TableCell>{new Date(post.date).toLocaleDateString('fa-IR')}</TableCell>
                   <TableCell>
                     <Button variant="outline" size="sm" asChild>
-                      <Link href={`/posts/${post.id}`}>View</Link>
+                      <Link href={`/posts/${post.id}`}>مشاهده</Link>
                     </Button>
                   </TableCell>
                 </TableRow>

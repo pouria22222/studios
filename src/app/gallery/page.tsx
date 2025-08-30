@@ -13,15 +13,13 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import type { GalleryImage } from '@/types';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export default function GalleryPage() {
   const images = getGalleryImages();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const { language } = useLanguage();
-  const t = translations[language].gallery;
+  const t = translations.gallery;
 
   const categories = useMemo(() => {
     const allCategories = images.map((image) => image.category);
@@ -44,7 +42,7 @@ export default function GalleryPage() {
 
 
   return (
-    <div className="space-y-8" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+    <div className="space-y-8" dir="rtl">
       <header className="text-center space-y-2">
         <h1 className="text-4xl font-headline font-bold tracking-tight sm:text-5xl">
           {t.title}

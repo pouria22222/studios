@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square, Loader2, MicOff } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 interface VoiceRecorderProps {
@@ -16,8 +15,7 @@ export function VoiceRecorder({ onTranscription, isLoading }: VoiceRecorderProps
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
-  const { language } = useLanguage();
-  const t = translations[language].voiceRecorder;
+  const t = translations.voiceRecorder;
 
 
   useEffect(() => {

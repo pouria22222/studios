@@ -2,20 +2,17 @@
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from './ui/button';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
-import { LanguageSwitcher } from './language-switcher';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 import { useState } from 'react';
 
 export function Header() {
-  const { language } = useLanguage();
-  const t = translations[language];
+  const t = translations;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" dir="rtl">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -38,7 +35,6 @@ export function Header() {
            <Button asChild variant="outline">
               <Link href="/admin">{t.header.admin}</Link>
             </Button>
-          <LanguageSwitcher />
           <ThemeToggle />
         </div>
         
@@ -50,7 +46,7 @@ export function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side={language === 'fa' ? 'right' : 'left'}>
+            <SheetContent side="right">
               <div className="flex flex-col gap-6 p-6">
                 <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="font-bold font-headline text-lg">{t.header.title}</span>
@@ -70,7 +66,6 @@ export function Header() {
                   </Link>
                 </nav>
                 <div className="flex items-center justify-start gap-4 pt-4 border-t">
-                  <LanguageSwitcher />
                   <ThemeToggle />
                 </div>
               </div>

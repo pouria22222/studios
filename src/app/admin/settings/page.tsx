@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export default function SettingsPage() {
@@ -15,8 +14,7 @@ export default function SettingsPage() {
   const [email, setEmail] = useState(initialSettings.email);
   const [instagram, setInstagram] = useState(initialSettings.instagram);
   const { toast } = useToast();
-  const { language } = useLanguage();
-  const t = translations[language].settings;
+  const t = translations.settings;
 
   const handleSave = () => {
     // In a real application, you would save this to a database.
@@ -29,7 +27,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+    <div className="space-y-6" dir="rtl">
       <h1 className="text-3xl font-headline font-bold">{t.title}</h1>
       <Card>
         <CardHeader>

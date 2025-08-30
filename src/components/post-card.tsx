@@ -1,20 +1,16 @@
-'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Post } from '@/types';
 import { CalendarDays } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const { language } = useLanguage();
-  const title = post.title[language];
-  const content = post.content[language];
+  const { title, content } = post;
   const snippet = content.replace(/<[^>]*>?/gm, '').substring(0, 100) + '...';
 
   return (
@@ -41,7 +37,7 @@ export function PostCard({ post }: PostCardProps) {
         <CardFooter className="flex justify-between items-center text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4" />
-            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString(language === 'fa' ? 'fa-IR' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
           </div>
           <div className="flex gap-2">
             {post.tags.slice(0, 2).map(tag => (

@@ -1,11 +1,8 @@
-'use client';
-
 import { getPostById } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, UserCircle } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 
 type PostPageProps = {
   params: {
@@ -15,35 +12,17 @@ type PostPageProps = {
 
 export default function PostPage({ params }: PostPageProps) {
   const post = getPostById(params.id);
-  const { language } = useLanguage();
 
   if (!post) {
     notFound();
   }
 
-  const title = post.title[language];
-  const content = post.content[language];
-
-  // TODO: Add metadata generation for different languages
-  /*
-  export async function generateMetadata({ params }: PostPageProps) {
-    const post = getPostById(params.id);
-    if (!post) {
-      return {
-        title: 'Post Not Found',
-      };
-    }
-    return {
-      title: `${post.title} | Nazy's Nook`,
-      description: post.content.substring(0, 160),
-    };
-  }
-  */
+  const { title, content } = post;
 
   return (
     <article
       className="max-w-4xl mx-auto"
-      dir={language === 'fa' ? 'rtl' : 'ltr'}
+      dir="rtl"
     >
       <header className="mb-8">
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg mb-8 shadow-lg">
@@ -69,7 +48,7 @@ export default function PostPage({ params }: PostPageProps) {
             <CalendarDays className="w-4 h-4" />
             <time dateTime={post.date}>
               {new Date(post.date).toLocaleDateString(
-                language === 'fa' ? 'fa-IR' : 'en-US',
+                'fa-IR',
                 { year: 'numeric', month: 'long', day: 'numeric' }
               )}
             </time>

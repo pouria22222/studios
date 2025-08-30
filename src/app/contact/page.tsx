@@ -3,16 +3,14 @@
 import { getSettings } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Instagram } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 export default function ContactPage() {
   const settings = getSettings();
-  const { language } = useLanguage();
-  const t = translations[language].contact;
+  const t = translations.contact;
 
   return (
-    <div className="space-y-8 max-w-2xl mx-auto" dir={language === 'fa' ? 'rtl' : 'ltr'}>
+    <div className="space-y-8 max-w-2xl mx-auto" dir="rtl">
       <header className="text-center space-y-2">
         <h1 className="text-4xl font-headline font-bold tracking-tight sm:text-5xl">
           {t.title}

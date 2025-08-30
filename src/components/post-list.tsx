@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { PostCard } from '@/components/post-card';
 import type { Post } from '@/types';
 import { Search } from 'lucide-react';
-import { useLanguage } from '@/context/language-provider';
 import { translations } from '@/lib/translations';
 
 interface PostListProps {
@@ -14,29 +13,28 @@ interface PostListProps {
 
 export function PostList({ posts }: PostListProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const { language } = useLanguage();
-  const t = translations[language].postList;
+  const t = translations.postList;
 
   const filteredPosts = useMemo(() => {
     if (!searchQuery) {
       return posts;
     }
     return posts.filter(post =>
-      post.title[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content[language].toLowerCase().includes(searchQuery.toLowerCase())
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [posts, searchQuery, language]);
+  }, [posts, searchQuery]);
 
   return (
     <div className="space-y-8">
       <div className="relative">
-        <Search className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
           placeholder={t.searchPlaceholder}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 rtl:pr-10 w-full max-w-sm mx-auto"
+          className="pr-10 w-full max-w-sm mx-auto"
         />
       </div>
       
