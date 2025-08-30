@@ -1,13 +1,14 @@
+
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { translations } from '@/lib/translations';
 import { refineBlogPostWithAI } from '@/ai/flows/refine-blog-post-with-ai';
 import { voiceToTextArticleCreation } from '@/ai/flows/voice-to-text-article-creation';
-import { Loader2, Wand2, Image as ImageIcon, UploadCloud } from 'lucide-react';
+import { Loader2, Wand2, Image as ImageIcon, UploadCloud, Bold, Italic, Link as LinkIcon } from 'lucide-react';
 import { VoiceRecorder } from './voice-recorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import Image from 'next/image';
@@ -17,18 +18,62 @@ export function PostEditor() {
   const [content, setContent] = useState('');
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [toolbarPosition, setToolbarPosition] = useState({ top: 0, left: 0 });
+
   const { toast } = useToast();
   const t = translations.postEditor;
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const contentImageInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const selectionRef = useRef<Selection | null>(null);
 
+
+  const handleContentChange = useCallback(() => {
+    if (editorRef.current) {
+      setContent(editorRef.current.innerHTML);
+    }
+  }, []);
+  
   // Sync state with editor only when necessary
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== content) {
       editorRef.current.innerHTML = content;
     }
   }, [content]);
+
+  const handleSelection = useCallback(() => {
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
+      selectionRef.current = selection;
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      if (editorRef.current) {
+        const editorRect = editorRef.current.getBoundingClientRect();
+        setToolbarPosition({
+          top: rect.top - editorRect.top - 40, // Position toolbar above selection
+          left: rect.left - editorRect.left + rect.width / 2 - 50, // Center toolbar
+        });
+        setShowToolbar(true);
+      }
+    } else {
+      setShowToolbar(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (editor) {
+      editor.addEventListener('mouseup', handleSelection);
+      editor.addEventListener('keyup', handleSelection);
+      editor.addEventListener('focusout', () => setShowToolbar(false)); // Hide on blur
+      return () => {
+        editor.removeEventListener('mouseup', handleSelection);
+        editor.removeEventListener('keyup', handleSelection);
+        editor.removeEventListener('focusout', () => setShowToolbar(false));
+      };
+    }
+  }, [handleSelection]);
 
 
   const handleSave = () => {
@@ -38,6 +83,21 @@ export function PostEditor() {
       description: "در یک برنامه واقعی، این پست به پایگاه داده ارسال می‌شد.",
     });
   };
+  
+  const handleFormat = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+    setShowToolbar(false);
+    handleContentChange();
+  };
+
+  const handleLink = () => {
+    const url = prompt('آدرس لینک را وارد کنید:');
+    if (url) {
+      handleFormat('createLink', url);
+    }
+  };
+
 
   const handleRefineWithAI = async () => {
     const currentContent = editorRef.current?.innerHTML || '';
@@ -51,10 +111,8 @@ export function PostEditor() {
     }
     setIsLoading(true);
     try {
-      // We need to handle simple text extraction for the AI
       const textContent = editorRef.current?.innerText || '';
       const result = await refineBlogPostWithAI({ blogPostContent: textContent });
-      // The AI returns plain text, so we wrap it in paragraphs
       const refinedHtml = result.refinedBlogPostContent.split('\n').map(p => `<p>${p}</p>`).join('');
       setContent(refinedHtml);
     } catch (error) {
@@ -102,10 +160,9 @@ export function PostEditor() {
   const insertImageInContent = (url: string) => {
     if (editorRef.current) {
       const imgHtml = `<img src="${url}" alt="تصویر درج شده" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />`;
-      // Restore focus and insert image at cursor position
       editorRef.current.focus();
       document.execCommand('insertHTML', false, imgHtml);
-      setContent(editorRef.current.innerHTML);
+      handleContentChange();
     }
   };
 
@@ -157,14 +214,33 @@ export function PostEditor() {
               dir="auto"
             />
 
-            <div
-              ref={editorRef}
-              contentEditable
-              onBlur={(e) => setContent(e.currentTarget.innerHTML)}
-              className="max-w-none text-lg min-h-[500px] border rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent"
-              dir="auto"
-              suppressContentEditableWarning
-            />
+            <div className="relative">
+              {showToolbar && (
+                <div
+                  className="absolute z-10 bg-background border rounded-md shadow-md p-1 flex gap-1"
+                  style={{ top: `${toolbarPosition.top}px`, left: `${toolbarPosition.left}px` }}
+                  onMouseDown={(e) => e.preventDefault()} // Prevent editor from losing focus
+                >
+                  <Button variant="ghost" size="icon" onClick={() => handleFormat('bold')}>
+                    <Bold className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleFormat('italic')}>
+                    <Italic className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={handleLink}>
+                    <LinkIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              <div
+                ref={editorRef}
+                contentEditable
+                onBlur={handleContentChange}
+                className="prose dark:prose-invert prose-lg max-w-none min-h-[500px] border rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent"
+                dir="auto"
+                suppressContentEditableWarning
+              />
+            </div>
           </div>
           <div className="lg:col-span-1 space-y-6 sticky top-20">
             <Card>
