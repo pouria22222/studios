@@ -1,14 +1,36 @@
+
+'use client';
+
 import Link from 'next/link';
 import { getPosts } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Eye, PenSquare, Trash2 } from 'lucide-react';
 import { translations } from '@/lib/translations';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 
 export default function AdminDashboardPage() {
   const posts = getPosts();
   const t = translations.admin;
+
+  const handleDelete = (postId: string) => {
+    // In a real application, you would call an API to delete the post.
+    // For this demo, we'll just log it and show an alert.
+    console.log(`Deleting post ${postId}`);
+    // You might want to show a toast notification here.
+  };
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -32,7 +54,7 @@ export default function AdminDashboardPage() {
               <TableRow>
                 <TableHead>عنوان</TableHead>
                 <TableHead>تاریخ</TableHead>
-                <TableHead>عملیات</TableHead>
+                <TableHead className="text-right">عملیات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -40,10 +62,44 @@ export default function AdminDashboardPage() {
                 <TableRow key={post.id}>
                   <TableCell className="font-medium">{post.title}</TableCell>
                   <TableCell>{new Date(post.date).toLocaleDateString('fa-IR')}</TableCell>
-                  <TableCell>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/posts/${post.id}`}>مشاهده</Link>
-                    </Button>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/posts/${post.id}`} title="مشاهده">
+                          <Eye className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" size="icon" asChild>
+                         {/* TODO: Create an edit page */}
+                        <Link href={`/admin/new`} title="ویرایش">
+                          <PenSquare className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" title="حذف">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent dir="rtl">
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>آیا مطمئن هستید؟</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              این عمل غیرقابل بازگشت است. این پست برای همیشه حذف خواهد شد.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>انصراف</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-destructive hover:bg-destructive/90"
+                              onClick={() => handleDelete(post.id)}
+                            >
+                              بله، حذف کن
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
