@@ -5,12 +5,81 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from './ui/button';
 import { translations } from '@/lib/translations';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, LogOut, LayoutDashboard } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import type { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
+
 
 export function Header() {
   const t = translations;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+    
+    // Check initial state
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+  
+  const AuthButtons = () => {
+    if (user) {
+      return (
+        <>
+          <Button asChild variant="outline">
+            <Link href="/admin">
+              <LayoutDashboard />
+              {t.admin.dashboard}
+            </Link>
+          </Button>
+          <Button onClick={handleLogout} variant="ghost" size="icon" title="خروج">
+            <LogOut />
+          </Button>
+        </>
+      );
+    }
+    return (
+      <Button asChild variant="outline">
+        <Link href="/auth">{t.header.admin}</Link>
+      </Button>
+    );
+  };
+  
+  const MobileAuthLinks = () => {
+     if (user) {
+        return (
+          <>
+            <Link href="/admin" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
+              {t.admin.dashboard}
+            </Link>
+            <Link href="#" className="transition-colors hover:text-foreground" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
+              خروج
+            </Link>
+          </>
+        );
+      }
+      return (
+        <Link href="/auth" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
+          {t.header.admin}
+        </Link>
+      );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" dir="rtl">
@@ -33,10 +102,8 @@ export function Header() {
         </div>
 
         <div className="hidden md:flex items-center justify-end space-x-2 rtl:space-x-reverse">
-           <Button asChild variant="outline">
-              <Link href="/auth">{t.header.admin}</Link>
-            </Button>
-          <ThemeToggle />
+           <AuthButtons />
+           <ThemeToggle />
         </div>
         
         <div className="flex items-center md:hidden">
@@ -62,9 +129,7 @@ export function Header() {
                   <Link href="/contact" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
                     {t.header.contact}
                   </Link>
-                  <Link href="/auth" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
-                    {t.header.admin}
-                  </Link>
+                  <MobileAuthLinks />
                 </nav>
                 <div className="flex items-center justify-start gap-4 pt-4 border-t">
                   <ThemeToggle />
