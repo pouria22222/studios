@@ -2,8 +2,8 @@ import { getPosts } from '@/lib/data';
 import { PostList } from '@/components/post-list';
 import { translations } from '@/lib/translations';
 
-export default function Home() {
-  const posts = getPosts();
+export default async function Home() {
+  const posts = await getPosts();
   const t = translations;
 
   return (
