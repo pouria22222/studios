@@ -53,6 +53,49 @@ export const getPostById = async (id: string): Promise<Post | null> => {
   };
 };
 
+export const createPost = async (postData: {
+  title: string;
+  content: string;
+  image_url: string;
+  tags: string[];
+}): Promise<Post | null> => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        console.error("No user logged in.");
+        throw new Error("You must be logged in to create a post.");
+    }
+    
+    const authorName = user.user_metadata.full_name || user.email;
+
+    const { data, error } = await supabase
+        .from('posts')
+        .insert([{
+            ...postData,
+            author: authorName,
+            date: new Date().toISOString(),
+            image_hint: 'blog post'
+        }])
+        .select()
+        .single();
+    
+    if (error) {
+        console.error('Error creating post:', error);
+        throw new Error(error.message);
+    }
+
+    return {
+        id: data.id,
+        title: data.title,
+        author: data.author,
+        date: data.date,
+        image: data.image_url,
+        imageHint: data.image_hint,
+        content: data.content,
+        tags: data.tags || [],
+    };
+};
+
 export const getGalleryImages = async (): Promise<GalleryImage[]> => {
   const { data, error } = await supabase
     .from('gallery_images')
