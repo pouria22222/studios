@@ -1,3 +1,4 @@
+
 'use client';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -33,7 +34,7 @@ export function Header() {
 
         <div className="hidden md:flex items-center justify-end space-x-2 rtl:space-x-reverse">
            <Button asChild variant="outline">
-              <Link href="/admin">{t.header.admin}</Link>
+              <Link href="/auth">{t.header.admin}</Link>
             </Button>
           <ThemeToggle />
         </div>
@@ -61,7 +62,7 @@ export function Header() {
                   <Link href="/contact" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
                     {t.header.contact}
                   </Link>
-                  <Link href="/admin" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link href="/auth" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
                     {t.header.admin}
                   </Link>
                 </nav>

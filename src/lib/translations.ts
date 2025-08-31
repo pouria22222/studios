@@ -1,10 +1,11 @@
+
 export const translations = {
   header: {
     title: 'کنج دنج نازی',
     blog: 'وبلاگ',
     gallery: 'گالری',
     contact: 'ارتباط با من',
-    admin: 'پنل مدیریت',
+    admin: 'ورود',
   },
   footer: {
     copyright: (year: number) => `© ${year} کنج دنج نازی. تمامی حقوق محفوظ است.`,
@@ -60,6 +61,12 @@ export const translations = {
     transcriptionError: 'رونویسی صدا ناموفق بود.',
     wip: 'قابلیت در دست ساخت',
     wipDesc: (element: string) => `افزودن ${element} هنوز پیاده‌سازی نشده است.`,
+    embed: {
+      title: "جاسازی از وب",
+      description: "لینک یوتیوب، توییتر و ... را وارد کنید.",
+      placeholder: "https://...",
+      button: "جاسازی"
+    }
   },
   voiceRecorder: {
       title: 'صدا به متن',
@@ -77,5 +84,22 @@ export const translations = {
     newPost: 'پست جدید',
     manageGallery: 'مدیریت گالری',
     settings: 'تنظیمات',
+  },
+  auth: {
+    emailLabel: 'ایمیل',
+    passwordLabel: 'رمز عبور',
+    nameLabel: 'نام',
+    login: {
+      tab: 'ورود',
+      title: 'ورود به حساب کاربری',
+      description: 'برای دسترسی به پنل مدیریت وارد شوید.',
+      button: 'ورود',
+    },
+    signup: {
+      tab: 'ثبت نام',
+      title: 'ایجاد حساب کاربری',
+      description: 'برای شروع یک حساب کاربری جدید بسازید.',
+      button: 'ثبت نام',
+    }
   }
 };
