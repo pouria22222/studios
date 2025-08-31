@@ -14,13 +14,18 @@ import { VoiceRecorder } from './voice-recorder';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import Image from 'next/image';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { createPost } from '@/lib/data';
+import { createPost, updatePost } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
+import type { Post } from '@/types';
 
-export function PostEditor() {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [mainImage, setMainImage] = useState<string | null>(null);
+interface PostEditorProps {
+  post?: Post;
+}
+
+export function PostEditor({ post }: PostEditorProps) {
+  const [title, setTitle] = useState(post?.title || '');
+  const [content, setContent] = useState(post?.content || '');
+  const [mainImage, setMainImage] = useState<string | null>(post?.image || null);
   const [isSaving, setIsSaving] = useState(false);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -34,6 +39,8 @@ export function PostEditor() {
   const mainImageInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const selectionRef = useRef<Range | null>(null);
+  
+  const isEditMode = !!post;
 
   const handleContentChange = useCallback(() => {
     if (editorRef.current) {
@@ -108,27 +115,30 @@ export function PostEditor() {
     }
     setIsSaving(true);
     try {
-      const newPost = await createPost({
+      const postData = {
         title,
         content,
         image_url: mainImage,
         tags: [], // TODO: Add tag input in the future
-      });
-
-      if (newPost) {
-        toast({
-          title: "پست با موفقیت ذخیره شد",
-          description: "پست شما در پایگاه داده ذخیره شد.",
-        });
-        router.push('/admin');
+      };
+      
+      if (isEditMode) {
+        await updatePost(post.id, postData);
       } else {
-        throw new Error("Failed to create post, maybe user is not logged in.");
+        await createPost(postData);
       }
+
+      toast({
+        title: `پست با موفقیت ${isEditMode ? 'به‌روز' : 'ذخیره'} شد`,
+      });
+      router.push('/admin');
+      router.refresh(); // To see the changes in the dashboard
+      
     } catch (error) {
        console.error("Error saving post:", error);
        toast({
         title: "خطا در ذخیره پست",
-        description: "مشکلی در هنگام ذخیره پست رخ داد.",
+        description: (error as Error).message,
         variant: 'destructive'
       });
     }
@@ -176,7 +186,7 @@ export function PostEditor() {
     try {
       const textContent = editorRef.current?.innerText || '';
       const result = await refineBlogPostWithAI({ blogPostContent: textContent });
-      const refinedHtml = result.refinedBlogPostContent.split('\n').map(p => `<p>${p}</p>`).join('');
+      const refinedHtml = result.refinedBlogPostContent.split('\\n').map(p => `<p>${p}</p>`).join('');
       setContent(refinedHtml);
     } catch (error) {
       console.error('Error refining content:', error);
@@ -249,7 +259,7 @@ export function PostEditor() {
 
   return (
     <div className="space-y-6" dir="rtl">
-      <h1 className="text-3xl font-bold font-headline">پست جدید</h1>
+      <h1 className="text-3xl font-bold font-headline">{isEditMode ? 'ویرایش پست' : 'پست جدید'}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 space-y-6">
           <Card>
@@ -378,7 +388,7 @@ export function PostEditor() {
               </Button>
               <VoiceRecorder onTranscription={handleTranscription} isLoading={isAiLoading} />
               <Button onClick={handleSave} disabled={isSaving || isAiLoading} className="w-full">
-                 {isSaving ? <Loader2 className="animate-spin" /> : t.savePost}
+                 {isSaving ? <Loader2 className="animate-spin" /> : (isEditMode ? 'به‌روزرسانی پست' : t.savePost)}
               </Button>
             </CardContent>
           </Card>

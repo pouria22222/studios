@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getPosts } from '@/lib/data';
+import { getPosts, deletePost } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -21,28 +21,40 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import type { Post } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 
 export default function AdminDashboardPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
   const t = translations.admin;
 
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    const fetchedPosts = await getPosts();
+    setPosts(fetchedPosts);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      const fetchedPosts = await getPosts();
-      setPosts(fetchedPosts);
-      setIsLoading(false);
-    };
     fetchPosts();
   }, []);
 
-  const handleDelete = (postId: string) => {
-    // In a real application, you would call an API to delete the post.
-    // For this demo, we'll just log it and show an alert.
-    console.log(`Deleting post ${postId}`);
-    // You might want to show a toast notification here.
+  const handleDelete = async (postId: string) => {
+    try {
+      await deletePost(postId);
+      toast({
+        title: "پست با موفقیت حذف شد",
+      });
+      fetchPosts(); // Refresh the list
+    } catch (error) {
+      toast({
+        title: "خطا در حذف پست",
+        description: (error as Error).message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -88,8 +100,7 @@ export default function AdminDashboardPage() {
                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          {/* TODO: Create an edit page */}
-                          <Link href={`/admin/new`} title="ویرایش">
+                          <Link href={`/admin/edit/${post.id}`} title="ویرایش">
                             <PenSquare className="h-4 w-4" />
                           </Link>
                         </Button>

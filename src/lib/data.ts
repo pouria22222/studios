@@ -96,6 +96,50 @@ export const createPost = async (postData: {
     };
 };
 
+export const updatePost = async (id: string, postData: {
+  title: string;
+  content: string;
+  image_url: string;
+  tags: string[];
+}): Promise<Post | null> => {
+  const { data, error } = await supabase
+    .from('posts')
+    .update(postData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating post:', error);
+    throw new Error(error.message);
+  }
+
+  return {
+    id: data.id,
+    title: data.title,
+    author: data.author,
+    date: data.date,
+    image: data.image_url,
+    imageHint: data.image_hint,
+    content: data.content,
+    tags: data.tags || [],
+  };
+};
+
+export const deletePost = async (id: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting post:', error);
+    throw new Error(error.message);
+  }
+
+  return true;
+};
+
 export const getGalleryImages = async (): Promise<GalleryImage[]> => {
   const { data, error } = await supabase
     .from('gallery_images')
