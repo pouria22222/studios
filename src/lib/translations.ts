@@ -90,16 +90,9 @@ export const translations = {
     passwordLabel: 'رمز عبور',
     nameLabel: 'نام',
     login: {
-      tab: 'ورود',
-      title: 'ورود به حساب کاربری',
-      description: 'برای دسترسی به پنل مدیریت وارد شوید.',
+      title: 'ورود به پنل مدیریت',
+      description: 'برای دسترسی به داشبورد، لطفا وارد شوید.',
       button: 'ورود',
-    },
-    signup: {
-      tab: 'ثبت نام',
-      title: 'ایجاد حساب کاربری',
-      description: 'برای شروع یک حساب کاربری جدید بسازید.',
-      button: 'ثبت نام',
     }
   }
 };
