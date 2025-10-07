@@ -6,8 +6,8 @@ import { Footer } from '@/components/footer';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "کنج دنج نازی",
-  description: 'وبلاگ شخصی نازی حسینی',
+  title: "Mr Robinhood",
+  description: "Mr Robinhood's personal blog",
 };
 
 export default function RootLayout({
@@ -16,14 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@6..72,400;6..72,700&display=swap" rel="stylesheet" />
         <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className="font-persian antialiased">
+      <body className="font-sans antialiased">
         <ThemeProvider>
             <div className="flex flex-col min-h-screen">
               <Header />

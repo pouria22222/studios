@@ -44,11 +44,11 @@ export function Header() {
         <>
           <Button asChild variant="outline">
             <Link href="/admin">
-              <LayoutDashboard />
+              <LayoutDashboard className="mr-2" />
               {t.admin.dashboard}
             </Link>
           </Button>
-          <Button onClick={handleLogout} variant="ghost" size="icon" title="خروج">
+          <Button onClick={handleLogout} variant="ghost" size="icon" title="Logout">
             <LogOut />
           </Button>
         </>
@@ -69,7 +69,7 @@ export function Header() {
               {t.admin.dashboard}
             </Link>
             <Link href="#" className="transition-colors hover:text-foreground" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
-              خروج
+              Logout
             </Link>
           </>
         );
@@ -82,18 +82,18 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" dir="rtl">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
+          <Link href="/" className="flex items-center space-x-2">
             <span className="font-bold font-headline text-lg">{t.header.title}</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
             <Link href="/" className="transition-colors hover:text-foreground/80 text-foreground/60">
               {t.header.blog}
             </Link>
-            <Link href="/gallery" className="transition-colors hover:text-foreground/80 text-foreground/60">
-              {t.header.gallery}
+            <Link href="/marketplace" className="transition-colors hover:text-foreground/80 text-foreground/60">
+              {t.header.marketplace}
             </Link>
             <Link href="/contact" className="transition-colors hover:text-foreground/80 text-foreground/60">
               {t.header.contact}
@@ -101,7 +101,7 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="hidden md:flex items-center justify-end space-x-2 rtl:space-x-reverse">
+        <div className="hidden md:flex items-center justify-end space-x-2">
            <AuthButtons />
            <ThemeToggle />
         </div>
@@ -114,17 +114,17 @@ export function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
+            <SheetContent side="left">
               <div className="flex flex-col gap-6 p-6">
-                <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link href="/" className="flex items-center space-x-2" onClick={() => setIsMobileMenuOpen(false)}>
                   <span className="font-bold font-headline text-lg">{t.header.title}</span>
                 </Link>
                 <nav className="flex flex-col gap-4 text-lg font-medium">
                   <Link href="/" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
                     {t.header.blog}
                   </Link>
-                  <Link href="/gallery" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
-                    {t.header.gallery}
+                  <Link href="/marketplace" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
+                    {t.header.marketplace}
                   </Link>
                   <Link href="/contact" className="transition-colors hover:text-foreground" onClick={() => setIsMobileMenuOpen(false)}>
                     {t.header.contact}

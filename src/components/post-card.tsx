@@ -37,7 +37,7 @@ export function PostCard({ post }: PostCardProps) {
         <CardFooter className="flex justify-between items-center text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4" />
-            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString('fa-IR', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+            <time dateTime={post.date}>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
           </div>
           <div className="flex gap-2">
             {post.tags.slice(0, 2).map(tag => (

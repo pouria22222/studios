@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { createPost, updatePost } from '@/lib/data';
 import { supabase } from '@/lib/supabaseClient';
 import type { Post } from '@/types';
+import { marked } from 'marked';
 
 interface PostEditorProps {
   post?: Post;
@@ -92,23 +93,70 @@ export function PostEditor({ post }: PostEditorProps) {
     }
   }, [saveSelection]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === ' ') {
+      const selection = window.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        if (node.nodeType === Node.TEXT_NODE) {
+          const text = node.textContent || '';
+          const lineStart = text.lastIndexOf('\n', range.startOffset) + 1;
+          const line = text.substring(lineStart, range.startOffset);
+
+          const match = line.match(/^(#{1,6})$/);
+          if (match) {
+            e.preventDefault();
+            const headingLevel = match[1].length;
+            
+            const newRange = document.createRange();
+            newRange.setStart(node, lineStart);
+            newRange.setEnd(node, range.startOffset);
+            newRange.deleteContents();
+
+            document.execCommand('formatBlock', false, `h${headingLevel}`);
+          }
+        }
+      }
+    }
+    handleSelection();
+  };
+
+  const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text/plain');
+    if (pastedText) {
+      try {
+        const html = await marked.parse(pastedText);
+        restoreSelection();
+        editorRef.current?.focus();
+        document.execCommand('insertHTML', false, html);
+        handleContentChange();
+      } catch (error) {
+        console.error('Error parsing pasted markdown:', error);
+        document.execCommand('insertText', false, pastedText);
+        handleContentChange();
+      }
+    }
+  };
+
+
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
     const handleMouseUp = () => setTimeout(handleSelection, 0);
     editor.addEventListener('mouseup', handleMouseUp);
-    editor.addEventListener('keyup', handleSelection);
     return () => {
       editor.removeEventListener('mouseup', handleMouseUp);
-      editor.removeEventListener('keyup', handleSelection);
     };
   }, [handleSelection]);
+
 
   const handleSave = async () => {
     if (!title || !content || !mainImage) {
       toast({
-        title: "خطا",
-        description: "لطفا عنوان، محتوا و تصویر شاخص را وارد کنید.",
+        title: "Error",
+        description: "Please enter a title, content, and featured image.",
         variant: "destructive",
       });
       return;
@@ -129,7 +177,7 @@ export function PostEditor({ post }: PostEditorProps) {
       }
 
       toast({
-        title: `پست با موفقیت ${isEditMode ? 'به‌روز' : 'ذخیره'} شد`,
+        title: `Post ${isEditMode ? 'updated' : 'saved'} successfully`,
       });
       router.push('/admin');
       router.refresh(); // To see the changes in the dashboard
@@ -137,7 +185,7 @@ export function PostEditor({ post }: PostEditorProps) {
     } catch (error) {
        console.error("Error saving post:", error);
        toast({
-        title: "خطا در ذخیره پست",
+        title: "Error saving post",
         description: (error as Error).message,
         variant: 'destructive'
       });
@@ -225,7 +273,7 @@ export function PostEditor({ post }: PostEditorProps) {
     if (error) {
       console.error('Error uploading image:', error);
       toast({
-        title: "خطا در آپلود تصویر",
+        title: "Error uploading image",
         description: error.message,
         variant: 'destructive',
       });
@@ -249,7 +297,7 @@ export function PostEditor({ post }: PostEditorProps) {
 
   const insertImageInContent = (url: string) => {
     if (editorRef.current) {
-      const imgHtml = `<img src="${url}" alt="تصویر درج شده" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />`;
+      const imgHtml = `<img src="${url}" alt="Inserted image" style="max-width: 100%; height: auto; border-radius: 0.5rem;" />`;
       editorRef.current.focus();
       restoreSelection();
       document.execCommand('insertHTML', false, imgHtml);
@@ -258,14 +306,14 @@ export function PostEditor({ post }: PostEditorProps) {
   };
 
   return (
-    <div className="space-y-6" dir="rtl">
-      <h1 className="text-3xl font-bold font-headline">{isEditMode ? 'ویرایش پست' : 'پست جدید'}</h1>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold font-headline">{isEditMode ? 'Edit Post' : 'New Post'}</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>تصویر شاخص</CardTitle>
-              <CardDescription>این تصویر در بالای پست شما و در لیست مقالات نمایش داده می‌شود.</CardDescription>
+              <CardTitle>Featured Image</CardTitle>
+              <CardDescription>This image will be displayed at the top of your post and in the post list.</CardDescription>
             </CardHeader>
             <CardContent>
               <input
@@ -277,12 +325,12 @@ export function PostEditor({ post }: PostEditorProps) {
               />
               {mainImage ? (
                 <div className="relative aspect-video rounded-md overflow-hidden group">
-                  <Image src={mainImage} alt="پیش نمایش تصویر شاخص" fill className="object-cover" />
+                  <Image src={mainImage} alt="Featured image preview" fill className="object-cover" />
                   <div
                     className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                     onClick={() => mainImageInputRef.current?.click()}
                   >
-                    <Button variant="secondary">تغییر تصویر</Button>
+                    <Button variant="secondary">Change Image</Button>
                   </div>
                 </div>
               ) : (
@@ -291,7 +339,7 @@ export function PostEditor({ post }: PostEditorProps) {
                   onClick={() => mainImageInputRef.current?.click()}
                 >
                   <UploadCloud className="w-12 h-12 text-muted-foreground" />
-                  <p className="mt-2 text-sm text-muted-foreground">برای آپلود کلیک کنید</p>
+                  <p className="mt-2 text-sm text-muted-foreground">Click to upload</p>
                 </div>
               )}
             </CardContent>
@@ -341,7 +389,7 @@ export function PostEditor({ post }: PostEditorProps) {
                           }
                         }}
                       />
-                      <Button size="sm" onClick={handleLink}>اعمال</Button>
+                      <Button size="sm" onClick={handleLink}>Apply</Button>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -363,7 +411,8 @@ export function PostEditor({ post }: PostEditorProps) {
               contentEditable
               onBlur={handleContentChange}
               onMouseUp={handleSelection}
-              onKeyUp={handleSelection}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
               className="prose dark:prose-invert prose-lg max-w-none min-h-[500px] border rounded-md p-4 focus:outline-none focus:ring-2 focus:ring-ring bg-transparent"
               dir="auto"
               suppressContentEditableWarning
@@ -381,14 +430,14 @@ export function PostEditor({ post }: PostEditorProps) {
                   <Loader2 className="animate-spin" />
                 ) : (
                   <>
-                    <Wand2 className="ml-2 h-4 w-4" />
+                    <Wand2 className="mr-2 h-4 w-4" />
                     {t.refineWithAI}
                   </>
                 )}
               </Button>
               <VoiceRecorder onTranscription={handleTranscription} isLoading={isAiLoading} />
               <Button onClick={handleSave} disabled={isSaving || isAiLoading} className="w-full">
-                 {isSaving ? <Loader2 className="animate-spin" /> : (isEditMode ? 'به‌روزرسانی پست' : t.savePost)}
+                 {isSaving ? <Loader2 className="animate-spin" /> : (isEditMode ? 'Update Post' : t.savePost)}
               </Button>
             </CardContent>
           </Card>

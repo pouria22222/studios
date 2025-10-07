@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, UserCircle } from 'lucide-react';
+import { marked } from 'marked';
 
 type PostPageProps = {
   params: {
@@ -18,11 +19,12 @@ export default async function PostPage({ params }: PostPageProps) {
   }
 
   const { title, content } = post;
+  const parsedContent = await marked.parse(content);
+
 
   return (
     <article
       className="max-w-4xl mx-auto"
-      dir="rtl"
     >
       <header className="mb-8">
         <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg mb-8 shadow-lg">
@@ -39,7 +41,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight mb-4 leading-tight">
           {title}
         </h1>
-        <div className="flex items-center space-x-4 rtl:space-x-reverse text-sm text-muted-foreground">
+        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <UserCircle className="w-4 h-4" />
             <span>{post.author}</span>
@@ -48,7 +50,7 @@ export default async function PostPage({ params }: PostPageProps) {
             <CalendarDays className="w-4 h-4" />
             <time dateTime={post.date}>
               {new Date(post.date).toLocaleDateString(
-                'fa-IR',
+                'en-US',
                 { year: 'numeric', month: 'long', day: 'numeric' }
               )}
             </time>
@@ -58,7 +60,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
       <div
         className="prose dark:prose-invert prose-lg max-w-none prose-p:text-foreground/80 prose-headings:font-headline prose-headings:text-foreground prose-img:rounded-lg"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: parsedContent }}
       />
 
       <footer className="mt-12 pt-8 border-t">

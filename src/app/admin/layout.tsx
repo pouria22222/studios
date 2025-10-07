@@ -4,8 +4,9 @@ import Link from 'next/link';
 import {
   LayoutDashboard,
   PlusCircle,
-  GalleryHorizontal,
+  ShoppingBag,
   Settings,
+  BarChart2
 } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
@@ -36,6 +37,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 {t.dashboard}
               </Link>
               <Link
+                href="/admin/analytics"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <BarChart2 className="h-4 w-4" />
+                {t.analytics}
+              </Link>
+              <Link
                 href="/admin/new"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
@@ -43,10 +51,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 {t.newPost}
               </Link>
               <Link
-                href="/gallery"
+                href="/admin/products"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
-                <GalleryHorizontal className="h-4 w-4" />
+                <ShoppingBag className="h-4 w-4" />
                 {t.manageGallery}
               </Link>
               <Link

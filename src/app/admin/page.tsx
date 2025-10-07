@@ -45,12 +45,12 @@ export default function AdminDashboardPage() {
     try {
       await deletePost(postId);
       toast({
-        title: "پست با موفقیت حذف شد",
+        title: "Post deleted successfully",
       });
       fetchPosts(); // Refresh the list
     } catch (error) {
       toast({
-        title: "خطا در حذف پست",
+        title: "Error deleting post",
         description: (error as Error).message,
         variant: "destructive",
       });
@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-6" dir="rtl">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-headline font-bold">{t.dashboard}</h1>
         <Button asChild>
@@ -70,8 +70,8 @@ export default function AdminDashboardPage() {
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>پست‌های وبلاگ</CardTitle>
-          <CardDescription>پست‌های وبلاگ موجود خود را مدیریت کنید.</CardDescription>
+          <CardTitle>Blog Posts</CardTitle>
+          <CardDescription>Manage your existing blog posts.</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -82,48 +82,48 @@ export default function AdminDashboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>عنوان</TableHead>
-                  <TableHead>تاریخ</TableHead>
-                  <TableHead className="text-right">عملیات</TableHead>
+                  <TableHead>Title</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {posts.map((post) => (
                   <TableRow key={post.id}>
                     <TableCell className="font-medium">{post.title}</TableCell>
-                    <TableCell>{new Date(post.date).toLocaleDateString('fa-IR')}</TableCell>
+                    <TableCell>{new Date(post.date).toLocaleDateString('en-US')}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/posts/${post.id}`} title="مشاهده">
+                          <Link href={`/posts/${post.id}`} title="View">
                             <Eye className="h-4 w-4" />
                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/admin/edit/${post.id}`} title="ویرایش">
+                          <Link href={`/admin/edit/${post.id}`} title="Edit">
                             <PenSquare className="h-4 w-4" />
                           </Link>
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" title="حذف">
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" title="Delete">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
-                          <AlertDialogContent dir="rtl">
+                          <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>آیا مطمئن هستید؟</AlertDialogTitle>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                این عمل غیرقابل بازگشت است. این پست برای همیشه حذف خواهد شد.
+                                This action cannot be undone. This will permanently delete the post.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                              <AlertDialogCancel>انصراف</AlertDialogCancel>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
                                 className="bg-destructive hover:bg-destructive/90"
                                 onClick={() => handleDelete(post.id)}
                               >
-                                بله، حذف کن
+                                Yes, delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>

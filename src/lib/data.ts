@@ -1,5 +1,6 @@
+
 import { supabase } from './supabaseClient';
-import type { Post, GalleryImage, Settings } from '@/types';
+import type { Post, Product, Settings } from '@/types';
 
 // Note: The mock data below is now replaced by Supabase calls.
 
@@ -7,24 +8,14 @@ export const getPosts = async (): Promise<Post[]> => {
   const { data, error } = await supabase
     .from('posts')
     .select('*')
-    .order('date', { ascending: false });
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching posts:', error);
     return [];
   }
   
-  // Map Supabase data to our Post type
-  return data.map(post => ({
-    id: post.id,
-    title: post.title,
-    author: post.author,
-    date: post.date,
-    image: post.image_url,
-    imageHint: post.image_hint,
-    content: post.content,
-    tags: post.tags || [],
-  }));
+  return data;
 };
 
 export const getPostById = async (id: string): Promise<Post | null> => {
@@ -41,41 +32,13 @@ export const getPostById = async (id: string): Promise<Post | null> => {
   
   if (!data) return null;
 
-  return {
-    id: data.id,
-    title: data.title,
-    author: data.author,
-    date: data.date,
-    image: data.image_url,
-    imageHint: data.image_hint,
-    content: data.content,
-    tags: data.tags || [],
-  };
+  return data;
 };
 
-export const createPost = async (postData: {
-  title: string;
-  content: string;
-  image_url: string;
-  tags: string[];
-}): Promise<Post | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        console.error("No user logged in.");
-        throw new Error("You must be logged in to create a post.");
-    }
-    
-    const authorName = user.user_metadata.full_name || user.email;
-
+export const createPost = async (postData: Omit<Post, 'id' | 'created_at'>): Promise<Post | null> => {
     const { data, error } = await supabase
         .from('posts')
-        .insert([{
-            ...postData,
-            author: authorName,
-            date: new Date().toISOString(),
-            image_hint: 'blog post'
-        }])
+        .insert([postData])
         .select()
         .single();
     
@@ -84,24 +47,10 @@ export const createPost = async (postData: {
         throw new Error(error.message);
     }
 
-    return {
-        id: data.id,
-        title: data.title,
-        author: data.author,
-        date: data.date,
-        image: data.image_url,
-        imageHint: data.image_hint,
-        content: data.content,
-        tags: data.tags || [],
-    };
+    return data;
 };
 
-export const updatePost = async (id: string, postData: {
-  title: string;
-  content: string;
-  image_url: string;
-  tags: string[];
-}): Promise<Post | null> => {
+export const updatePost = async (id: number, postData: Partial<Post>): Promise<Post | null> => {
   const { data, error } = await supabase
     .from('posts')
     .update(postData)
@@ -114,19 +63,10 @@ export const updatePost = async (id: string, postData: {
     throw new Error(error.message);
   }
 
-  return {
-    id: data.id,
-    title: data.title,
-    author: data.author,
-    date: data.date,
-    image: data.image_url,
-    imageHint: data.image_hint,
-    content: data.content,
-    tags: data.tags || [],
-  };
+  return data;
 };
 
-export const deletePost = async (id: string): Promise<boolean> => {
+export const deletePost = async (id: number): Promise<boolean> => {
   const { error } = await supabase
     .from('posts')
     .delete()
@@ -134,45 +74,116 @@ export const deletePost = async (id: string): Promise<boolean> => {
 
   if (error) {
     console.error('Error deleting post:', error);
-    throw new Error(error.message);
+    return false;
   }
 
   return true;
 };
 
-export const getGalleryImages = async (): Promise<GalleryImage[]> => {
+export const getProducts = async (): Promise<Product[]> => {
   const { data, error } = await supabase
-    .from('gallery_images')
+    .from('products')
     .select('*')
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching gallery images:', error);
+    console.error('Error fetching products:', error);
     return [];
   }
   return data;
 };
 
+export const createProduct = async (productData: Omit<Product, 'id' | 'created_at'>): Promise<Product | null> => {
+  const { data, error } = await supabase
+    .from('products')
+    .insert([productData])
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating product:', error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const updateProduct = async (id: number, productData: Partial<Product>): Promise<Product | null> => {
+  const { data, error } = await supabase
+    .from('products')
+    .update(productData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating product:', error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+export const deleteFile = async (bucket: string, filePath: string): Promise<boolean> => {
+    const { error } = await supabase.storage.from(bucket).remove([filePath]);
+    if (error) {
+        console.error('Error deleting file:', error);
+        return false;
+    }
+    return true;
+};
+
+export const deleteProduct = async (id: number): Promise<boolean> => {
+  const { data: product, error: fetchError } = await supabase
+    .from('products')
+    .select('download_url')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) {
+    console.error('Error fetching product for deletion:', fetchError);
+    return false;
+  }
+
+  if (product && product.download_url) {
+    const success = await deleteFile('downloadable', product.download_url);
+    if (!success) {
+      return false; 
+    }
+  }
+
+  const { error: deleteError } = await supabase
+    .from('products')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    console.error('Error deleting product:', deleteError);
+    return false;
+  }
+
+  return true;
+};
+
+
 export const getSettings = async (): Promise<Settings> => {
   const { data, error } = await supabase
     .from('settings')
-    .select('email, instagram')
+    .select('email, youtube, telegram')
     .eq('id', 1)
     .single();
 
   if (error) {
     console.error('Error fetching settings:', error);
-    // Return default/empty settings on error
-    return { email: '', instagram: '' };
+    return { email: '', youtube: '', telegram: '' };
   }
-  return data || { email: '', instagram: '' };
+  return data || { email: '', youtube: '', telegram: '' };
 };
 
 export const updateSettings = async (newSettings: Partial<Settings>): Promise<Settings> => {
   const { data, error } = await supabase
     .from('settings')
-    .update(newSettings)
-    .eq('id', 1)
+    .upsert({ ...newSettings, id: 1 })
     .select()
     .single();
 
@@ -182,4 +193,33 @@ export const updateSettings = async (newSettings: Partial<Settings>): Promise<Se
   }
 
   return data;
+};
+
+export const uploadFile = async (bucket: string, file: File): Promise<string | null> => {
+  const fileName = `${Date.now()}-${file.name}`;
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .upload(fileName, file);
+
+  if (error) {
+    console.error('Error uploading file:', error);
+    return null;
+  }
+
+  return data.path;
+};
+
+export const getPublicUrl = (bucket: string, path: string | null): string | null => {
+    if (!path) {
+        return null;
+    }
+    const { data } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(path, { download: true });
+
+    if (!data.publicUrl || data.publicUrl.endsWith('/')) {
+        return null;
+    }
+
+    return data.publicUrl;
 };

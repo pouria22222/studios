@@ -34,15 +34,15 @@ export default function SettingsPage() {
     if (!settings) return;
     setIsSaving(true);
     try {
-      await updateSettings({ email: settings.email, instagram: settings.instagram });
+      await updateSettings({ email: settings.email, youtube: settings.youtube, telegram: settings.telegram });
       toast({
         title: t.saveSuccessTitle,
         description: t.saveSuccessDesc,
       });
     } catch (error) {
        toast({
-        title: "خطا",
-        description: "ذخیره تنظیمات ناموفق بود.",
+        title: "Error",
+        description: "There was an error saving the settings.",
         variant: 'destructive'
       });
     }
@@ -55,15 +55,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6" dir="rtl">
-      <h1 className="text-3xl font-headline font-bold">{t.title}</h1>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-headline font-bold">Settings</h1>
       <Card>
         <CardHeader>
-          <CardTitle>{t.cardTitle}</CardTitle>
-          <CardDescription>{t.cardDescription}</CardDescription>
+          <CardTitle>Contact Information</CardTitle>
+          <CardDescription>Update your public contact information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {isLoading || !settings ? (
+          {isLoading ? (
             <div className="space-y-4">
               <div className="space-y-2">
                 <Skeleton className="h-4 w-20" />
@@ -78,27 +78,37 @@ export default function SettingsPage() {
           ) : (
             <>
               <div className="space-y-2">
-                <Label htmlFor="email">{t.emailLabel}</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="your.email@example.com"
-                  value={settings.email}
+                  value={settings?.email || ''}
                   onChange={handleInputChange}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="instagram">{t.instagramLabel}</Label>
+                <Label htmlFor="youtube">Youtube</Label>
                 <Input
-                  id="instagram"
+                  id="youtube"
                   type="text"
-                  placeholder="your_instagram_handle"
-                  value={settings.instagram}
+                  placeholder="your_youtube_handle"
+                  value={settings?.youtube || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telegram">Telegram</Label>
+                <Input
+                  id="telegram"
+                  type="text"
+                  placeholder="your_telegram_handle"
+                  value={settings?.telegram || ''}
                   onChange={handleInputChange}
                 />
               </div>
               <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? <Loader2 className="animate-spin" /> : t.saveButton}
+                {isSaving ? <Loader2 className="animate-spin" /> : 'Save Changes'}
               </Button>
             </>
           )}

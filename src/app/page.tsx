@@ -7,7 +7,7 @@ export default async function Home() {
   const t = translations;
 
   return (
-    <div className="space-y-8" dir="rtl">
+    <div className="space-y-8">
       <header className="text-center space-y-2">
         <h1 className="text-4xl font-headline font-bold tracking-tight sm:text-5xl">{t.home.title}</h1>
         <p className="text-muted-foreground text-lg">{t.home.subtitle}</p>
