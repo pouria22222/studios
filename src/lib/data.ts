@@ -35,7 +35,7 @@ export const getPostById = async (id: string): Promise<Post | null> => {
   return data;
 };
 
-export const createPost = async (postData: Omit<Post, 'id' | 'created_at'>): Promise<Post | null> => {
+export const createPost = async (postData: Omit<Post, 'id' | 'created_at' | 'tags'>): Promise<Post | null> => {
     const { data, error } = await supabase
         .from('posts')
         .insert([postData])
@@ -50,7 +50,7 @@ export const createPost = async (postData: Omit<Post, 'id' | 'created_at'>): Pro
     return data;
 };
 
-export const updatePost = async (id: number, postData: Partial<Post>): Promise<Post | null> => {
+export const updatePost = async (id: number, postData: Partial<Omit<Post, 'tags'>>): Promise<Post | null> => {
   const { data, error } = await supabase
     .from('posts')
     .update(postData)

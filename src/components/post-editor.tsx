@@ -163,10 +163,21 @@ export function PostEditor({ post }: PostEditorProps) {
     }
     setIsSaving(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+            title: "Error",
+            description: "You must be logged in to create a post.",
+            variant: "destructive",
+        });
+        return;
+      }
       const postData = {
         title,
         content,
-        image_url: mainImage,
+        image: mainImage,
+        author: user.email || 'Anonymous',
+        date: new Date().toISOString(),
         tags: [], // TODO: Add tag input in the future
       };
       
